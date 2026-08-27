@@ -1,0 +1,31 @@
+---
+import Admin from '../../../layouts/Admin.astro'
+import { q } from '../../../lib/db.js'
+const { rows: posts } = await q(
+  `select p.id, p.slug, p.titulo, p.status, p.publicado_em,
+     coalesce((select sum(acessos) from pageview v where v.rota = '/' || p.slug), 0)::int acessos
+   from post p order by p.criado_em desc`,
+)
+---
+<Admin titulo="Posts">
+  <h1>Posts</h1>
+  <p><a class="botao" href="/admin/posts/novo">+ Novo post</a></p>
+  <div class="cartao rolagem">
+    <table>
+      <thead><tr><th>Título</th><th>Status</th><th style="text-align:right">Acessos</th><th></th></tr></thead>
+      <tbody>
+        {posts.map((p) => (
+          <tr>
+            <td><b>{p.titulo}</b><div style="color:var(--suave);font-size:12.5px">/{p.slug}</div></td>
+            <td>{p.status === 'PUBLICADO'
+              ? <span class="pill pub">no ar</span>
+              : <span class="pill rasc">rascunho</span>}</td>
+            <td class="num">{p.acessos}</td>
+            <td style="text-align:right"><a href={`/admin/posts/${p.id}`}>editar</a></td>
+          </tr>
+        ))}
+        {posts.length === 0 && <tr><td colspan="4" style="color:var(--suave)">Nenhum post ainda — escreva o primeiro.</td></tr>}
+      </tbody>
+    </table>
+  </div>
+</Admin>

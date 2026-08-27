@@ -1,0 +1,141 @@
+---
+import Admin from '../../../layouts/Admin.astro'
+import { q } from '../../../lib/db.js'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const RAIZ = process.env.ARQUIVOS_DIR || path.resolve('./arquivos')
+const IMAGENS = { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/webp': '.webp' }
+
+const { id } = Astro.params
+const novo = id === 'novo'
+
+/** Titulo -> slug: minusculo, sem acento, hifens. O campo fica editavel mesmo assim. */
+const slugDe = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 80)
+
+/**
+ * Grava a capa enviada em arquivos/enviados/capas — `enviados` e o volume do
+ * container, o unico lugar que sobrevive a um rebuild da imagem.
+ */
+async function salvarCapa(arquivo, slug) {
+  const ext = IMAGENS[arquivo.type]
+  if (!ext) return { erro: 'A capa precisa ser PNG, JPG ou WEBP.' }
+  if (arquivo.size > 6 * 1024 * 1024) return { erro: 'Capa acima de 6 MB — comprima a imagem antes.' }
+  fs.mkdirSync(path.join(RAIZ, 'enviados/capas'), { recursive: true })
+  const relativo = `enviados/capas/${slug}-${Date.now()}${ext}`
+  fs.writeFileSync(path.join(RAIZ, relativo), Buffer.from(await arquivo.arrayBuffer()))
+  return { caminho: relativo }
+}
+
+let post = { id: null, slug: '', titulo: '', resumo: '', conteudo_md: '', status: 'RASCUNHO', capa: null, capa_alt: '' }
+let erro = ''
+
+if (Astro.request.method === 'POST') {
+  const f = await Astro.request.formData()
+  const titulo = String(f.get('titulo') || '').trim()
+  const slug = (String(f.get('slug') || '').trim() || slugDe(titulo)).replace(/[^a-z0-9-]/g, '')
+  const resumo = String(f.get('resumo') || '').trim()
+  const conteudo = String(f.get('conteudo') || '')
+  const capaAlt = String(f.get('capa_alt') || '').trim().slice(0, 200)
+  const capaEnviada = f.get('capa')
+  const removerCapa = f.get('remover_capa') === 'on'
+  const publicar = f.get('acao') === 'publicar'
+  const despublicar = f.get('acao') === 'despublicar'
+
+  // Capa atual (se houver) para preservar quando o formulario nao envia arquivo novo.
+  let capa = null
+  if (!novo) {
+    const atual = await q(`select capa from post where id = $1`, [Number(id)])
+    capa = atual.rows[0]?.capa || null
+  }
+  if (removerCapa) capa = null
+
+  if (!titulo || !slug) {
+    erro = 'Titulo e obrigatorio.'
+    post = { ...post, titulo, slug, resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt }
+  } else if (['admin', 'materiais', 'api', 'baixar', 'capa', 'rss.xml', 'sitemap.xml', 'robots.txt'].includes(slug)) {
+    erro = `O endereco /${slug} e reservado do sistema — escolha outro.`
+    post = { ...post, titulo, slug: '', resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt }
+  } else {
+    if (capaEnviada instanceof File && capaEnviada.size > 0) {
+      const r = await salvarCapa(capaEnviada, slug)
+      if (r.erro) erro = r.erro
+      else capa = r.caminho
+    }
+    if (!erro) {
+      try {
+        if (novo) {
+          const r = await q(
+            `insert into post (slug, titulo, resumo, conteudo_md, capa, capa_alt, status, publicado_em)
+             values ($1,$2,$3,$4,$5,$6,$7,$8) returning id`,
+            [slug, titulo, resumo, conteudo, capa, capaAlt,
+              publicar ? 'PUBLICADO' : 'RASCUNHO', publicar ? new Date() : null],
+          )
+          return Astro.redirect(`/admin/posts/${r.rows[0].id}`, 303)
+        }
+        await q(
+          `update post set slug=$1, titulo=$2, resumo=$3, conteudo_md=$4, capa=$5, capa_alt=$6,
+             status = case when $7 then 'PUBLICADO' when $8 then 'RASCUNHO' else status end,
+             publicado_em = case when $7 and publicado_em is null then now() else publicado_em end,
+             atualizado_em = now()
+           where id = $9`,
+          [slug, titulo, resumo, conteudo, capa, capaAlt, publicar, despublicar, Number(id)],
+        )
+        return Astro.redirect(`/admin/posts/${id}`, 303)
+      } catch (e) {
+        erro = String(e.message).includes('unique') ? `Ja existe um post em /${slug}.` : 'Nao foi possivel salvar.'
+      }
+    }
+    post = { ...post, titulo, slug, resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt }
+  }
+} else if (!novo) {
+  const { rows } = await q(`select * from post where id = $1`, [Number(id)])
+  if (rows.length === 0) return Astro.redirect('/admin/posts', 303)
+  post = rows[0]
+}
+---
+<Admin titulo={novo ? 'Novo post' : 'Editar post'}>
+  <h1>{novo ? 'Novo post' : post.titulo}</h1>
+  {!novo && post.status === 'PUBLICADO' &&
+    <p><a href={`/${post.slug}`} target="_blank" rel="noopener">Ver no blog ↗</a></p>}
+  {erro && <p style="color:#A83A32">{erro}</p>}
+  <form method="post" enctype="multipart/form-data" class="cartao">
+    <label for="titulo">Título</label>
+    <input id="titulo" name="titulo" required maxlength="140" value={post.titulo}
+      placeholder="Ex.: 5 causas de rejeição no CT-e e como resolver" />
+    <label for="slug">Endereço (slug) <span style="font-weight:400;color:var(--suave)">— em branco, sai do título</span></label>
+    <input id="slug" name="slug" maxlength="80" value={post.slug} placeholder="5-causas-de-rejeicao-no-cte" />
+    <label for="resumo">Resumo <span style="font-weight:400;color:var(--suave)">— aparece na home, no Google e no RSS</span></label>
+    <input id="resumo" name="resumo" maxlength="200" value={post.resumo} placeholder="Uma frase que faz querer clicar." />
+
+    <fieldset style="border:1px solid var(--linha); border-radius:12px; padding:6px 16px 16px; margin:18px 0 0">
+      <legend style="font-weight:700; font-size:13.5px; padding:0 6px">Capa</legend>
+      {post.capa && (
+        <div style="margin:8px 0 6px">
+          <img src={`/capa/${post.capa}`} alt="" style="width:100%;max-width:420px;height:auto;border-radius:10px;border:1px solid var(--linha)" />
+          <label style="font-weight:400;font-size:13.5px;margin-top:8px">
+            <input type="checkbox" name="remover_capa" style="width:auto;margin-right:6px" />
+            remover a capa atual
+          </label>
+        </div>
+      )}
+      <label for="capa">{post.capa ? 'Trocar por outra imagem' : 'Imagem de capa'}
+        <span style="font-weight:400;color:var(--suave)"> — PNG, JPG ou WEBP, até 6 MB. Ideal 1200×630.</span></label>
+      <input id="capa" name="capa" type="file" accept="image/png,image/jpeg,image/webp" />
+      <label for="capa_alt">Descrição da imagem (alt)
+        <span style="font-weight:400;color:var(--suave)"> — para leitor de tela e para o Google</span></label>
+      <input id="capa_alt" name="capa_alt" maxlength="200" value={post.capa_alt || ''}
+        placeholder="Ex.: caminhão baú saindo do pátio ao amanhecer" />
+    </fieldset>
+
+    <label for="conteudo">Conteúdo (Markdown)</label>
+    <textarea id="conteudo" name="conteudo" placeholder={'## Um subtitulo\n\nEscreva normalmente. **Negrito**, listas com -, links [assim](https://...).\n\nImagem no meio do texto: ![descricao](/capa/enviados/capas/arquivo.png)'}>{post.conteudo_md}</textarea>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button class="botao neutro" type="submit" name="acao" value="salvar">Salvar rascunho</button>
+      <button class="botao" type="submit" name="acao" value="publicar">Publicar</button>
+      {!novo && post.status === 'PUBLICADO' &&
+        <button class="botao neutro" type="submit" name="acao" value="despublicar">Voltar para rascunho</button>}
+    </div>
+  </form>
+</Admin>

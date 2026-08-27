@@ -1,0 +1,125 @@
+---
+/**
+ * Casca de toda pagina publica. Identidade do produto (DESIGN-SYSTEM.md do RotaCTe):
+ * dark goldenrod + tinta espresso, Open Sans. SEO no <head>: title/description por
+ * pagina, Open Graph e canonical.
+ *
+ * Regra de contraste que vale em todo lugar: botao dourado leva texto ESPRESSO,
+ * nunca branco (dourado com branco da 2,9:1 e reprova em AA).
+ */
+const {
+  titulo,
+  descricao = 'CT-e, MDF-e, reforma tributaria e custo de frota explicados sem juridiques, para quem toca transportadora.',
+  caminho = '/',
+  tipo = 'website',
+  imagem = null,   // caminho da capa dentro de ./arquivos (vira og:image absoluto)
+} = Astro.props
+const site = (import.meta.env.SITE_URL || process.env.SITE_URL || 'https://blog.rotacte.com.br').replace(/\/$/, '')
+const canonico = site + caminho
+const ogImagem = imagem ? `${site}/capa/${imagem}` : null
+const tituloCheio = titulo ? `${titulo} · Blog RotaCTe` : 'Blog RotaCTe'
+const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='o' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23d0a63c'/%3E%3Cstop offset='.55' stop-color='%23b8860b'/%3E%3Cstop offset='1' stop-color='%23946c08'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23o)'/%3E%3Cg transform='translate(32 32) scale(0.088)'%3E%3Ccircle r='215' fill='none' stroke='%23fff' stroke-width='100'/%3E%3Cpath d='M 274 -43 L 1 -111 L 178 -307 Z' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E"
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{tituloCheio}</title>
+  <meta name="description" content={descricao} />
+  <link rel="canonical" href={canonico} />
+  <meta property="og:site_name" content="Blog RotaCTe" />
+  <meta property="og:title" content={tituloCheio} />
+  <meta property="og:description" content={descricao} />
+  <meta property="og:type" content={tipo} />
+  <meta property="og:url" content={canonico} />
+  <meta property="og:locale" content="pt_BR" />
+  {ogImagem && <meta property="og:image" content={ogImagem} />}
+  {ogImagem && <meta property="og:image:width" content="1200" />}
+  {ogImagem && <meta property="og:image:height" content="630" />}
+  <meta name="twitter:card" content={ogImagem ? 'summary_large_image' : 'summary'} />
+  <link rel="alternate" type="application/rss+xml" title="Blog RotaCTe" href={`${site}/rss.xml`} />
+  <link rel="icon" href={favicon} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" />
+  <style is:global>
+    :root {
+      /* Tokens do produto (frontend/src/index.css) */
+      --marca: #b8860b; --marca-clara: #d0a63c; --marca-escura: #946c08;
+      --ouro: linear-gradient(180deg, #d0a63c 0%, #b8860b 55%, #946c08 100%);
+      --espresso: #23201a; --sobre-ouro: #231f19;
+      --fundo: #faf8f3; --card: #ffffff; --neutro: #f4efe4;
+      --texto: #2a2620; --suave: #7c756a;
+      --linha: #e7e0d1; --linha-forte: #d8cfbb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Open Sans', system-ui, sans-serif; background: var(--fundo); color: var(--texto); line-height: 1.65; }
+    a { color: var(--marca-escura); }
+
+    .topo-blog { background: var(--espresso); color: #fff; border-bottom: 3px solid var(--marca); }
+    .topo-blog .miolo { display: flex; align-items: center; gap: 16px; padding: 13px 18px; }
+    .topo-blog .marca { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .topo-blog .marca svg { height: 25px; width: auto; display: block; }
+    .topo-blog .marca .selo { color: var(--marca-clara); font-weight: 600; font-size: 14px; letter-spacing: .02em;
+      border-left: 1px solid #4b443a; padding-left: 9px; }
+    .topo-blog nav { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+    .topo-blog nav a { color: #e6ded0; text-decoration: none; font-size: 14.5px; font-weight: 600; }
+    .topo-blog nav a:hover { color: #fff; }
+    .topo-blog .cta { background: var(--ouro); color: var(--sobre-ouro); padding: 8px 15px; border-radius: 8px; font-weight: 700; }
+    .topo-blog .cta:hover { color: var(--sobre-ouro); filter: brightness(1.06); }
+
+    .miolo { max-width: 860px; margin: 0 auto; padding: 0 18px; }
+    main.miolo { padding-top: 34px; padding-bottom: 62px; }
+    h1 { font-size: clamp(26px, 5vw, 36px); line-height: 1.22; letter-spacing: -.4px; margin: 0 0 10px; color: var(--espresso); }
+    h2 { color: var(--espresso); margin-top: 34px; letter-spacing: -.2px; }
+    .cartao { background: var(--card); border: 1px solid var(--linha); border-radius: 14px; padding: 22px 24px; }
+    .botao { display: inline-block; background: var(--ouro); color: var(--sobre-ouro); border: 0; border-radius: 8px;
+      padding: 11px 20px; font: 700 15px 'Open Sans', sans-serif; text-decoration: none; cursor: pointer; }
+    .botao:hover { filter: brightness(1.06); color: var(--sobre-ouro); }
+    .botao.secundario { background: var(--neutro); color: var(--espresso); border: 1px solid var(--linha-forte); }
+    .rotulo-data { color: var(--suave); font-size: 13.5px; }
+    .rodape-blog { border-top: 1px solid var(--linha); color: var(--suave); font-size: 13.5px; background: var(--neutro); }
+    .rodape-blog .miolo { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 22px 18px; }
+    input, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--linha-forte); border-radius: 8px;
+      font: 400 15px 'Open Sans', sans-serif; background: #fff; color: var(--texto); }
+    input:focus, textarea:focus { outline: 2px solid var(--marca-clara); outline-offset: 1px; border-color: var(--marca); }
+    label { font-weight: 600; font-size: 14px; display: block; margin: 14px 0 5px; }
+    @media (max-width: 640px) {
+      .topo-blog nav a.some-mobile { display: none; }
+      .topo-blog .marca .selo { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topo-blog">
+    <div class="miolo">
+      <a class="marca" href="/" aria-label="Blog RotaCTe">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" role="img" aria-label="RotaCTe">
+          <g transform="translate(0 52) scale(0.05603)">
+            <path fill="#faf8f3" d="M294.2 -713.9Q386.7 -713.9 447.0 -691.3Q507.3 -668.7 536.9 -622.8Q566.4 -576.9 566.4 -506.3Q566.4 -453.6 546.9 -416.4Q527.3 -379.2 495.6 -354.7Q463.9 -330.3 427.5 -315.9L630.4 0.0H498.0L325.4 -285.9H210.9V0.0H93.8V-713.9ZM286.4 -616.0H210.9V-382.6H292.0Q373.3 -382.6 410.2 -413.0Q447.0 -443.4 447.0 -502.4Q447.0 -564.2 407.7 -590.1Q368.4 -616.0 286.4 -616.0Z"/><path fill="#faf8f3" d="M1488.2 -82.8Q1510.4 -82.8 1532.5 -86.9Q1554.6 -91.1 1572.7 -97.2V-10.3Q1553.7 -1.7 1523.4 4.0Q1493.1 9.8 1460.2 9.8Q1414.5 9.8 1377.8 -5.6Q1341.0 -21.0 1319.5 -58.5Q1298.0 -95.9 1298.0 -162.6V-452.9H1224.3V-504.2L1303.7 -544.9L1341.3 -660.6H1413.3V-540.5H1568.1V-452.9H1413.3V-163.8Q1413.3 -123.0 1433.8 -102.9Q1454.3 -82.8 1488.2 -82.8Z"/><path fill="#faf8f3" d="M1872.2 -550.5Q1975.0 -550.5 2027.5 -505.1Q2080.0 -459.7 2080.0 -363.8V0.0H1998.5L1976.2 -76.7H1972.3Q1949.4 -47.4 1925.0 -28.2Q1900.6 -9.0 1868.7 0.4Q1836.8 9.8 1790.9 9.8Q1742.3 9.8 1704.3 -8.1Q1666.2 -25.9 1644.3 -62.4Q1622.5 -98.9 1622.5 -155.0Q1622.5 -238.5 1684.7 -280.6Q1747.0 -322.8 1873.0 -326.9L1966.5 -330.3V-358.6Q1966.5 -414.8 1940.3 -438.7Q1914.2 -462.6 1867.1 -462.6Q1826.3 -462.6 1788.2 -450.9Q1750.2 -439.2 1714.0 -422.4L1676.9 -503.4Q1716.7 -524.2 1767.1 -537.4Q1817.5 -550.5 1872.2 -550.5ZM1966.0 -258.3 1896.4 -255.6Q1810.2 -252.7 1775.7 -226.3Q1741.1 -200.0 1741.1 -154.1Q1741.1 -114.0 1765.1 -95.8Q1789.0 -77.6 1828.0 -77.6Q1887.6 -77.6 1926.8 -111.6Q1966.0 -145.5 1966.0 -211.2Z"/><path fill="#faf8f3" d="M2531.6 -565.9Q2497.4 -565.9 2470.6 -551.5Q2443.7 -537.1 2424.7 -509.8Q2405.7 -482.4 2395.6 -443.1Q2385.6 -403.8 2385.6 -354.0Q2385.6 -286.6 2402.7 -240.7Q2419.8 -194.8 2454.7 -171.4Q2489.6 -147.9 2542.4 -147.9Q2590.2 -147.9 2634.4 -161.1Q2678.6 -174.3 2723.5 -192.9V-29.8Q2676.2 -8.8 2626.6 0.5Q2577.0 9.8 2521.4 9.8Q2405.2 9.8 2331.2 -36.4Q2257.2 -82.5 2222.3 -164.6Q2187.4 -246.6 2187.4 -355.0Q2187.4 -436.0 2210.1 -503.4Q2232.8 -570.8 2276.7 -620.4Q2320.7 -669.9 2385.4 -697.0Q2450.1 -724.1 2533.6 -724.1Q2585.3 -724.1 2642.7 -712.2Q2700.1 -700.2 2754.8 -673.8L2695.7 -522.0Q2656.6 -540.5 2616.6 -553.2Q2576.6 -565.9 2531.6 -565.9Z"/><path fill="#faf8f3" d="M3155.6 0.0H2962.8V-556.2H2788.4V-713.9H3329.5V-556.2H3155.6Z"/><path fill="#faf8f3" d="M3647.3 -563.0Q3727.9 -563.0 3786.5 -534.9Q3845.1 -506.8 3876.8 -450.7Q3908.5 -394.5 3908.5 -310.1V-225.1H3567.2Q3569.7 -181.6 3599.7 -153.8Q3629.7 -126.0 3688.3 -126.0Q3740.1 -126.0 3783.3 -136.2Q3826.5 -146.5 3872.4 -168.0V-30.8Q3832.4 -9.8 3785.0 0.0Q3737.6 9.8 3665.4 9.8Q3581.9 9.8 3515.9 -20.0Q3450.0 -49.8 3412.2 -112.3Q3374.3 -174.8 3374.3 -272.9Q3374.3 -372.6 3408.5 -436.8Q3442.7 -501.0 3504.2 -532.0Q3565.8 -563.0 3647.3 -563.0ZM3654.1 -433.1Q3620.4 -433.1 3597.7 -411.9Q3575.0 -390.6 3571.1 -345.2H3735.2Q3734.7 -369.6 3725.4 -389.6Q3716.1 -409.7 3698.3 -421.4Q3680.5 -433.1 3654.1 -433.1Z"/>
+            <g transform="translate(922 -270)"><circle r="215" fill="none" stroke="#d0a63c" stroke-width="100"/><path d="M 274 -43 L 1 -111 L 178 -307 Z" fill="#d0a63c"/></g>
+          </g>
+        </svg>
+        <span class="selo">blog</span>
+      </a>
+      <nav>
+        <a href="/" class="some-mobile">Artigos</a>
+        <a href="/materiais">Materiais gratuitos</a>
+        <a class="cta" href="https://app.rotacte.com.br/registrar" rel="noopener">Testar o RotaCTe</a>
+      </nav>
+    </div>
+  </header>
+  <main class="miolo">
+    <slot />
+  </main>
+  <footer class="rodape-blog">
+    <div class="miolo">
+      <span>© RotaCTe — CT-e, MDF-e, frota e financeiro no mesmo sistema.</span>
+      <a href="https://rotacte.com.br">Site</a>
+      <a href="https://app.rotacte.com.br">Entrar no sistema</a>
+      <a href="/rss.xml">RSS</a>
+    </div>
+  </footer>
+</body>
+</html>

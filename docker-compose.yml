@@ -1,0 +1,26 @@
+# ============================================================================
+# Blog do RotaCTe — mesmo desenho dos outros apps da VPS: um container na rede
+# `funilads_default` (onde vive o Postgres compartilhado, host `db`), porta so
+# no localhost; quem expoe para a internet e o nginx do host.
+#
+# Porta 8007: 8005 e do orbys-front, 8006 do blog do Reservya.
+# ============================================================================
+name: rotacte-blog
+services:
+  blog:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8007:4321"
+    env_file: .env
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+    volumes:
+      - ./arquivos/enviados:/app/arquivos/enviados
+    networks:
+      - funilads
+
+networks:
+  funilads:
+    external: true
+    name: funilads_default

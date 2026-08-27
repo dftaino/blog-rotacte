@@ -1,0 +1,50 @@
+---
+import { senhaConfere, cookieDeSessao, sessaoValida, podeTentar, registrarFalha } from '../../lib/admin.js'
+
+if (sessaoValida(Astro.cookies)) return Astro.redirect('/admin', 303)
+
+let erro = ''
+if (Astro.request.method === 'POST') {
+  const ip = Astro.clientAddress || 'local'
+  if (!podeTentar(ip)) {
+    erro = 'Muitas tentativas. Aguarde 10 minutos.'
+  } else {
+    const form = await Astro.request.formData()
+    if (senhaConfere(form.get('senha'))) {
+      Astro.cookies.set('adm', cookieDeSessao(), {
+        httpOnly: true, sameSite: 'lax', secure: import.meta.env.PROD, path: '/', maxAge: 60 * 60 * 12,
+      })
+      return Astro.redirect('/admin', 303)
+    }
+    registrarFalha(ip)
+    erro = 'Senha incorreta.'
+  }
+}
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" /><title>Entrar</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" />
+  <style>
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:#23201a; font-family:'Open Sans',system-ui,sans-serif; }
+    form { background:#fff; border-radius:14px; padding:28px; width:100%; max-width:330px; }
+    input { width:100%; padding:10px 12px; border:1px solid #d8cfbb; border-radius:8px; box-sizing:border-box;
+      font:400 15px 'Open Sans',sans-serif; }
+    input:focus { outline:2px solid #d0a63c; outline-offset:1px; border-color:#b8860b; }
+    button { width:100%; margin-top:12px; background:linear-gradient(180deg,#d0a63c 0%,#b8860b 55%,#946c08 100%);
+      color:#231f19; border:0; border-radius:8px; padding:11px; font:700 15px 'Open Sans',sans-serif; cursor:pointer; }
+    .erro { color:#A83A32; font-size:13.5px; }
+  </style>
+</head>
+<body>
+  <form method="post">
+    <h1 style="font-size:19px;color:#23201a;margin:0 0 14px">Admin do blog · RotaCTe</h1>
+    {erro && <p class="erro">{erro}</p>}
+    <input type="password" name="senha" placeholder="Senha" autofocus required />
+    <button type="submit">Entrar</button>
+  </form>
+</body>
+</html>

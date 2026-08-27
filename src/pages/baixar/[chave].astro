@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro'
+import { q } from '../../lib/db.js'
+
+const { chave } = Astro.params
+const { rows } = await q(
+  `select l.nome, m.titulo, m.slug from lead l join material m on m.id = l.material_id
+   where l.chave = $1`, [chave],
+)
+if (rows.length === 0) return new Response(null, { status: 404 })
+const { nome, titulo, slug } = rows[0]
+const primeiro = nome.split(/\s+/)[0]
+---
+<Base titulo={`Baixar: ${titulo}`} caminho={`/materiais/${slug}`}>
+  <h1>Pronto, {primeiro}!</h1>
+  <p style="color:var(--suave)">Seu material está liberado. Guarde este link: ele continua valendo se você precisar baixar de novo.</p>
+  <p style="margin-top:18px"><a class="botao" href={`/baixar/${chave}/arquivo`}>⬇ Baixar {titulo}</a></p>
+  <div class="cartao" style="margin-top:34px">
+    <strong>Enquanto o download termina…</strong>
+    <p style="margin:6px 0 10px;color:var(--suave)">O RotaCTe emite CT-e, MDF-e e NF-e, controla frota, motoristas e
+      financeiro no mesmo lugar — e tem teste grátis.</p>
+    <a class="botao" href="https://app.rotacte.com.br/registrar">Criar minha conta</a>
+  </div>
+</Base>

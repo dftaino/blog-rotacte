@@ -1,0 +1,107 @@
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" />
+<style>html,body{margin:0;padding:0;width:1200px;height:630px;overflow:hidden}</style></head>
+<body>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" font-family="Open Sans, sans-serif">
+  <defs>
+    <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d0a63c"/><stop offset=".55" stop-color="#b8860b"/><stop offset="1" stop-color="#946c08"/>
+    </linearGradient>
+    <radialGradient id="glow3" cx="24%" cy="16%" r="72%">
+      <stop offset="0" stop-color="#b8860b" stop-opacity=".28"/><stop offset="1" stop-color="#23201a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="s3" x="-25%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".45"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="#23201a"/>
+  <rect width="1200" height="630" fill="url(#glow3)"/>
+
+  <text x="80" y="92" font-size="21" font-weight="700" fill="#c9bda6" letter-spacing="3">MDF-e · A VIAGEM INTEIRA</text>
+
+  <!-- selo do manifesto -->
+  <g transform="translate(80 132)">
+    <rect width="336" height="88" rx="14" fill="#2e2a22" stroke="#4b4438"/>
+    <rect x="18" y="19" width="50" height="50" rx="10" fill="url(#ouro)"/>
+    <text x="43" y="53" text-anchor="middle" font-size="25" font-weight="800" fill="#231f19">M</text>
+    <text x="84" y="43" font-size="23" font-weight="800" fill="#faf8f3">um manifesto</text>
+    <text x="84" y="71" font-size="19" fill="#a99e8c">por veículo, por percurso</text>
+  </g>
+
+  <!-- estrada -->
+  <g>
+    <rect x="0" y="452" width="1200" height="10" fill="#4b4438"/>
+    <g stroke="#d0a63c" stroke-width="7" stroke-linecap="round" stroke-dasharray="30 24">
+      <path d="M40 457h1120"/>
+    </g>
+  </g>
+
+  <!-- origem -->
+  <g transform="translate(126 452)">
+    <circle r="20" fill="#faf8f3"/><circle r="8.5" fill="#b8860b"/>
+    <text x="0" y="56" text-anchor="middle" font-size="20" font-weight="700" fill="#c9bda6">origem</text>
+  </g>
+
+  <!-- destino: bandeira de chegada -->
+  <g transform="translate(1044 452)">
+    <rect x="-3.5" y="-118" width="7" height="122" rx="3.5" fill="#faf8f3"/>
+    <g transform="translate(3.5 -118)">
+      <rect width="78" height="50" fill="#faf8f3"/>
+      <g fill="#23201a">
+        <rect width="19.5" height="16.6"/><rect x="39" width="19.5" height="16.6"/>
+        <rect x="19.5" y="16.6" width="19.5" height="16.8"/><rect x="58.5" y="16.6" width="19.5" height="16.8"/>
+        <rect y="33.4" width="19.5" height="16.6"/><rect x="39" y="33.4" width="19.5" height="16.6"/>
+      </g>
+    </g>
+    <text x="20" y="56" text-anchor="middle" font-size="20" font-weight="700" fill="#c9bda6">encerramento</text>
+  </g>
+
+  <!-- caminhao: rodas apoiadas na estrada (y=452) -->
+  <g transform="translate(392 0)" filter="url(#s3)">
+    <!-- bau -->
+    <rect x="0" y="252" width="248" height="170" rx="10" fill="#faf8f3"/>
+    <rect x="0" y="252" width="248" height="26" rx="10" fill="#e7e0d1"/>
+    <!-- documentos dentro do bau -->
+    <g transform="translate(22 296)">
+      <g transform="rotate(-5)">
+        <rect width="56" height="76" rx="7" fill="#fff" stroke="#d8cfbb"/>
+        <rect x="9" y="12" width="38" height="6" rx="3" fill="#b8860b"/>
+        <rect x="9" y="28" width="32" height="4.5" rx="2.2" fill="#e7e0d1"/>
+        <rect x="9" y="40" width="38" height="4.5" rx="2.2" fill="#e7e0d1"/>
+        <rect x="9" y="52" width="26" height="4.5" rx="2.2" fill="#e7e0d1"/>
+      </g>
+      <g transform="translate(68 6) rotate(4)">
+        <rect width="56" height="76" rx="7" fill="#fff" stroke="#d8cfbb"/>
+        <rect x="9" y="12" width="38" height="6" rx="3" fill="#b8860b"/>
+        <rect x="9" y="28" width="32" height="4.5" rx="2.2" fill="#e7e0d1"/>
+        <rect x="9" y="40" width="38" height="4.5" rx="2.2" fill="#e7e0d1"/>
+        <rect x="9" y="52" width="26" height="4.5" rx="2.2" fill="#e7e0d1"/>
+      </g>
+      <g transform="translate(136 0) rotate(-2)">
+        <rect width="56" height="76" rx="7" fill="#fff" stroke="#d8cfbb"/>
+        <rect x="9" y="12" width="38" height="6" rx="3" fill="#b8860b"/>
+        <rect x="9" y="28" width="32" height="4.5" rx="2.2" fill="#e7e0d1"/>
+        <rect x="9" y="40" width="38" height="4.5" rx="2.2" fill="#e7e0d1"/>
+        <rect x="9" y="52" width="26" height="4.5" rx="2.2" fill="#e7e0d1"/>
+      </g>
+    </g>
+    <!-- cabine -->
+    <g transform="translate(248 0)">
+      <path d="M0 306h62l46 58v58H0z" fill="url(#ouro)"/>
+      <path d="M12 318h44l32 42H12z" fill="#2e2a22" opacity=".8"/>
+      <rect x="96" y="392" width="14" height="10" rx="3" fill="#ffe9a8"/>
+    </g>
+    <!-- chassi -->
+    <rect x="0" y="422" width="358" height="12" fill="#3a342b"/>
+    <!-- rodas (centro y=452, r=30 -> tocam a estrada) -->
+    <g fill="#171410">
+      <circle cx="72" cy="452" r="30"/><circle cx="176" cy="452" r="30"/><circle cx="312" cy="452" r="30"/>
+    </g>
+    <g fill="#8c8377">
+      <circle cx="72" cy="452" r="11"/><circle cx="176" cy="452" r="11"/><circle cx="312" cy="452" r="11"/>
+    </g>
+  </g>
+</svg>
+</body></html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" />
+<style>html,body{margin:0;padding:0;width:1200px;height:630px;overflow:hidden}</style></head>
+<body>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" font-family="Open Sans, sans-serif">
+  <defs>
+    <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d0a63c"/><stop offset=".55" stop-color="#b8860b"/><stop offset="1" stop-color="#946c08"/>
+    </linearGradient>
+    <linearGradient id="trilho" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d8cfbb"/><stop offset="1" stop-color="#b8860b"/>
+    </linearGradient>
+    <filter id="s2" x="-20%" y="-20%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#23201a" flood-opacity=".16"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="#faf8f3"/>
+  <rect width="1200" height="14" fill="url(#ouro)"/>
+
+  <text x="80" y="112" font-size="21" font-weight="700" fill="#7c756a" letter-spacing="3">REFORMA TRIBUTÁRIA</text>
+  <text x="80" y="176" font-size="49" font-weight="800" fill="#23201a">Cinco tributos viram dois</text>
+
+  <!-- de -> para -->
+  <g transform="translate(80 214)" font-size="21">
+    <g filter="url(#s2)">
+      <rect width="300" height="58" rx="12" fill="#fff" stroke="#e7e0d1"/>
+      <text x="20" y="37" font-weight="600" fill="#7c756a">PIS · COFINS · ICMS · ISS</text>
+    </g>
+    <path d="M322 29h44" stroke="#b8860b" stroke-width="4" stroke-linecap="round"/>
+    <path d="M356 19l14 10-14 10" fill="none" stroke="#b8860b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <g filter="url(#s2)" transform="translate(388 0)">
+      <rect width="216" height="58" rx="12" fill="url(#ouro)"/>
+      <text x="24" y="38" font-size="24" font-weight="800" fill="#231f19">IBS + CBS</text>
+    </g>
+  </g>
+
+  <!-- linha do tempo -->
+  <g transform="translate(80 362)">
+    <rect y="52" width="1040" height="8" rx="4" fill="url(#trilho)"/>
+
+    <g transform="translate(0 0)">
+      <circle cx="58" cy="56" r="15" fill="#d8cfbb"/><circle cx="58" cy="56" r="6" fill="#faf8f3"/>
+      <g filter="url(#s2)"><rect x="0" y="86" width="230" height="112" rx="14" fill="#fff" stroke="#e7e0d1"/></g>
+      <text x="20" y="126" font-size="34" font-weight="800" fill="#23201a">2026</text>
+      <text x="20" y="156" font-size="19" fill="#7c756a">ano de teste:</text>
+      <text x="20" y="180" font-size="19" fill="#7c756a">campos novos no XML</text>
+    </g>
+
+    <g transform="translate(270 0)">
+      <circle cx="58" cy="56" r="15" fill="#c9a95c"/><circle cx="58" cy="56" r="6" fill="#faf8f3"/>
+      <g filter="url(#s2)"><rect x="0" y="86" width="230" height="112" rx="14" fill="#fff" stroke="#e7e0d1"/></g>
+      <text x="20" y="126" font-size="34" font-weight="800" fill="#23201a">2027</text>
+      <text x="20" y="156" font-size="19" fill="#7c756a">CBS pra valer;</text>
+      <text x="20" y="180" font-size="19" fill="#7c756a">PIS e COFINS acabam</text>
+    </g>
+
+    <g transform="translate(540 0)">
+      <circle cx="58" cy="56" r="15" fill="#b8860b"/><circle cx="58" cy="56" r="6" fill="#faf8f3"/>
+      <g filter="url(#s2)"><rect x="0" y="86" width="230" height="112" rx="14" fill="#fff" stroke="#e7e0d1"/></g>
+      <text x="20" y="126" font-size="34" font-weight="800" fill="#23201a">2029—32</text>
+      <text x="20" y="156" font-size="19" fill="#7c756a">transição:</text>
+      <text x="20" y="180" font-size="19" fill="#7c756a">ICMS e ISS encolhem</text>
+    </g>
+
+    <g transform="translate(810 0)">
+      <circle cx="58" cy="56" r="15" fill="#946c08"/><circle cx="58" cy="56" r="6" fill="#faf8f3"/>
+      <g filter="url(#s2)"><rect x="0" y="86" width="230" height="112" rx="14" fill="url(#ouro)"/></g>
+      <text x="20" y="126" font-size="34" font-weight="800" fill="#231f19">2033</text>
+      <text x="20" y="156" font-size="19" fill="#3a3226">modelo pleno:</text>
+      <text x="20" y="180" font-size="19" fill="#3a3226">só IBS e CBS</text>
+    </g>
+  </g>
+</svg>
+</body></html>

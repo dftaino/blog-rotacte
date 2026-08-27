@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro'
+import { q } from '../lib/db.js'
+
+const { rows: posts } = await q(
+  `select slug, titulo, resumo, publicado_em, capa, capa_alt from post
+   where status = 'PUBLICADO' order by publicado_em desc limit 30`,
+)
+const dataBr = (d) => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+---
+<Base titulo="" caminho="/">
+  <h1>Documento fiscal e frota, explicados sem juridiquês</h1>
+  <p style="color:var(--suave);max-width:62ch">
+    CT-e, MDF-e, reforma tributária, CIOT e custo por quilômetro — o que o dono de transportadora
+    precisa saber para não travar a emissão nem perder dinheiro na estrada. Escrito por quem
+    desenvolve o RotaCTe.
+  </p>
+
+  {posts.length === 0 && (
+    <div class="cartao" style="margin-top:24px">Os primeiros artigos estão a caminho. Enquanto isso,
+      veja os <a href="/materiais">materiais gratuitos</a>.</div>
+  )}
+
+  <div style="display:flex;flex-direction:column;gap:14px;margin-top:26px">
+    {posts.map((p) => (
+      <article class="cartao cartao-post">
+        {p.capa && (
+          <a href={`/${p.slug}`} class="capa-link">
+            <img src={`/capa/${p.capa}`} alt={p.capa_alt || ''} width="1200" height="630" loading="lazy" />
+          </a>
+        )}
+        <div class="miolo-post">
+          <div class="rotulo-data">{dataBr(p.publicado_em)}</div>
+          <h2 style="margin:4px 0 8px;font-size:21px"><a href={`/${p.slug}`} style="text-decoration:none;color:var(--espresso)">{p.titulo}</a></h2>
+          <p style="margin:0;color:var(--suave)">{p.resumo}</p>
+          <p style="margin:12px 0 0"><a href={`/${p.slug}`}>Ler o artigo →</a></p>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <style>
+    /* Card com capa: a imagem encosta na borda, o texto mantém o respiro do cartão. */
+    .cartao-post { padding: 0; overflow: hidden; }
+    .capa-link { display: block; line-height: 0; border-bottom: 1px solid var(--linha); }
+    .capa-link img { width: 100%; height: auto; display: block; }
+    .miolo-post { padding: 20px 24px 22px; }
+  </style>
+</Base>

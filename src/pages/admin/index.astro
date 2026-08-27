@@ -1,0 +1,48 @@
+---
+import Admin from '../../layouts/Admin.astro'
+import { q } from '../../lib/db.js'
+
+const [hoje, mes, top, porDia, leads] = await Promise.all([
+  q(`select coalesce(sum(acessos),0)::int total from pageview where dia = current_date`),
+  q(`select coalesce(sum(acessos),0)::int total from pageview where dia >= current_date - 29`),
+  q(`select rota, sum(acessos)::int acessos from pageview where dia >= current_date - 29
+     group by rota order by acessos desc limit 10`),
+  q(`select dia, sum(acessos)::int acessos from pageview where dia >= current_date - 29
+     group by dia order by dia`),
+  q(`select count(*)::int total,
+            count(*) filter (where criado_em >= now() - interval '30 days')::int mes from lead`),
+])
+const maiorDia = Math.max(1, ...porDia.rows.map((d) => d.acessos))
+const dataBr = (d) => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+---
+<Admin titulo="Metricas">
+  <h1>Métricas</h1>
+  <div class="grade-kpi">
+    <div class="kpi"><div class="v">{hoje.rows[0].total}</div><div class="r">acessos hoje</div></div>
+    <div class="kpi"><div class="v">{mes.rows[0].total}</div><div class="r">acessos em 30 dias</div></div>
+    <div class="kpi"><div class="v">{leads.rows[0].mes}</div><div class="r">leads em 30 dias</div></div>
+    <div class="kpi"><div class="v">{leads.rows[0].total}</div><div class="r">leads desde o início</div></div>
+  </div>
+
+  <div class="cartao">
+    <strong>Acessos por dia (30 dias)</strong>
+    <div style="display:flex;align-items:flex-end;gap:3px;height:90px;margin-top:12px">
+      {porDia.rows.map((d) => (
+        <div title={`${dataBr(d.dia)}: ${d.acessos}`}
+          style={`flex:1;background:#b8860b;border-radius:3px 3px 0 0;height:${Math.max(4, Math.round((d.acessos / maiorDia) * 90))}px`} />
+      ))}
+      {porDia.rows.length === 0 && <span style="color:var(--suave);font-size:13.5px">Sem acessos registrados ainda.</span>}
+    </div>
+  </div>
+
+  <div class="cartao rolagem">
+    <strong>Páginas mais vistas (30 dias)</strong>
+    <table style="margin-top:8px">
+      <thead><tr><th>Página</th><th style="text-align:right">Acessos</th></tr></thead>
+      <tbody>
+        {top.rows.map((t) => (<tr><td>{t.rota}</td><td class="num">{t.acessos}</td></tr>))}
+        {top.rows.length === 0 && <tr><td colspan="2" style="color:var(--suave)">Nada ainda.</td></tr>}
+      </tbody>
+    </table>
+  </div>
+</Admin>

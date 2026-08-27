@@ -1,0 +1,66 @@
+---
+import Admin from '../../layouts/Admin.astro'
+import { q } from '../../lib/db.js'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const RAIZ = process.env.ARQUIVOS_DIR || path.resolve('./arquivos')
+let erro = ''
+
+if (Astro.request.method === 'POST') {
+  const f = await Astro.request.formData()
+  const titulo = String(f.get('titulo') || '').trim()
+  const descricao = String(f.get('descricao') || '').trim()
+  const arquivo = f.get('arquivo')
+  const slug = titulo.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 60)
+  if (!titulo || !slug || !(arquivo instanceof File) || arquivo.size === 0) {
+    erro = 'Preencha o titulo e escolha um PDF.'
+  } else if (!arquivo.name.toLowerCase().endsWith('.pdf')) {
+    erro = 'So aceitamos PDF por enquanto.'
+  } else if (arquivo.size > 25 * 1024 * 1024) {
+    erro = 'Arquivo acima de 25 MB.'
+  } else {
+    fs.mkdirSync(path.join(RAIZ, 'enviados'), { recursive: true })
+    const nomeFisico = `enviados/${slug}-${Date.now()}.pdf`
+    fs.writeFileSync(path.join(RAIZ, nomeFisico), Buffer.from(await arquivo.arrayBuffer()))
+    try {
+      await q(`insert into material (slug, titulo, descricao, arquivo) values ($1,$2,$3,$4)`,
+        [slug, titulo, descricao, nomeFisico])
+      return Astro.redirect('/admin/materiais', 303)
+    } catch { erro = 'Ja existe um material com esse titulo/slug.' }
+  }
+}
+
+const { rows: materiais } = await q(
+  `select m.*, (select count(*) from lead l where l.material_id = m.id)::int leads
+   from material m order by m.id`,
+)
+---
+<Admin titulo="Materiais">
+  <h1>Materiais de captação</h1>
+  <div class="cartao rolagem">
+    <table>
+      <thead><tr><th>Material</th><th>Página</th><th style="text-align:right">Leads</th><th>Status</th></tr></thead>
+      <tbody>
+        {materiais.map((m) => (
+          <tr><td><b>{m.titulo}</b><div style="color:var(--suave);font-size:12.5px">{m.descricao}</div></td>
+            <td><a href={`/materiais/${m.slug}`} target="_blank" rel="noopener">/materiais/{m.slug}</a></td>
+            <td class="num">{m.leads}</td>
+            <td>{m.ativo ? <span class="pill pub">ativo</span> : <span class="pill rasc">inativo</span>}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" enctype="multipart/form-data" class="cartao">
+    <strong>Novo material</strong>
+    {erro && <p style="color:#A83A32">{erro}</p>}
+    <label for="titulo">Título</label>
+    <input id="titulo" name="titulo" required maxlength="120" placeholder="Ex.: Checklist do MDF-e" />
+    <label for="descricao">Descrição <span style="font-weight:400;color:var(--suave)">— aparece na página de captação</span></label>
+    <input id="descricao" name="descricao" maxlength="240" placeholder="O que a pessoa ganha baixando isto." />
+    <label for="arquivo">Arquivo PDF</label>
+    <input id="arquivo" name="arquivo" type="file" accept="application/pdf" required />
+    <p style="margin-top:14px"><button class="botao" type="submit">Adicionar material</button></p>
+  </form>
+</Admin>

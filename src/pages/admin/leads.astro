@@ -1,0 +1,35 @@
+---
+import Admin from '../../layouts/Admin.astro'
+import { q } from '../../lib/db.js'
+const { rows: leads } = await q(
+  `select l.nome, l.email, l.whatsapp, l.criado_em, m.titulo material
+   from lead l left join material m on m.id = l.material_id
+   order by l.criado_em desc limit 300`,
+)
+const { rows: porMaterial } = await q(
+  `select m.titulo, count(*)::int total from lead l join material m on m.id = l.material_id
+   group by m.titulo order by total desc`,
+)
+const dataBr = (d) => new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+---
+<Admin titulo="Leads">
+  <h1>Leads</h1>
+  <p><a class="botao" href="/admin/leads.csv">⬇ Exportar CSV</a></p>
+  <div class="grade-kpi">
+    {porMaterial.map((m) => (
+      <div class="kpi"><div class="v">{m.total}</div><div class="r">{m.titulo}</div></div>
+    ))}
+  </div>
+  <div class="cartao rolagem">
+    <table>
+      <thead><tr><th>Quando</th><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Material</th></tr></thead>
+      <tbody>
+        {leads.map((l) => (
+          <tr><td style="white-space:nowrap">{dataBr(l.criado_em)}</td><td>{l.nome}</td>
+            <td>{l.email}</td><td>{l.whatsapp || '—'}</td><td>{l.material || '—'}</td></tr>
+        ))}
+        {leads.length === 0 && <tr><td colspan="5" style="color:var(--suave)">Nenhum lead ainda. Divulgue a página /materiais.</td></tr>}
+      </tbody>
+    </table>
+  </div>
+</Admin>

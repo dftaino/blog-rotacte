@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro'
+import { q } from '../lib/db.js'
+import { render } from '../lib/markdown.js'
+
+const { slug } = Astro.params
+const { rows } = await q(
+  `select * from post where slug = $1 and status = 'PUBLICADO'`, [slug],
+)
+if (rows.length === 0) return new Response(null, { status: 404 })
+const post = rows[0]
+const html = render(post.conteudo_md)
+const dataBr = new Date(post.publicado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+const { rows: materiais } = await q(`select slug, titulo, descricao from material where ativo order by id limit 2`)
+---
+<Base titulo={post.titulo} descricao={post.resumo} caminho={`/${post.slug}`} tipo="article" imagem={post.capa}>
+  <article>
+    <div class="rotulo-data">{dataBr}</div>
+    <h1>{post.titulo}</h1>
+    {post.capa && (
+      <img class="capa-post" src={`/capa/${post.capa}`} alt={post.capa_alt || post.titulo}
+        width="1200" height="630" />
+    )}
+    <div class="corpo-post" set:html={html} />
+  </article>
+
+  {materiais.length > 0 && (
+    <aside class="cartao" style="margin-top:38px;border-left:4px solid var(--marca)">
+      <strong>Material gratuito</strong>
+      <p style="margin:6px 0 10px;color:var(--suave)">{materiais[0].descricao}</p>
+      <a class="botao" href={`/materiais/${materiais[0].slug}`}>Baixar: {materiais[0].titulo}</a>
+    </aside>
+  )}
+
+  <style is:global>
+    .capa-post { width: 100%; height: auto; display: block; border-radius: 14px;
+      border: 1px solid var(--linha); margin: 18px 0 26px; }
+    .corpo-post { font-size: 17px; max-width: 68ch; }
+    .corpo-post h2 { margin-top: 34px; }
+    .corpo-post img { max-width: 100%; border-radius: 10px; border: 1px solid var(--linha); }
+    .corpo-post blockquote { border-left: 4px solid var(--marca-clara); margin: 18px 0; padding: 4px 18px; color: var(--suave); }
+    .corpo-post code { background: var(--neutro); border-radius: 4px; padding: 1px 6px; font-size: .9em; }
+    .corpo-post table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 18px 0; display: block; overflow-x: auto; }
+    .corpo-post th { text-align: left; background: var(--neutro); padding: 8px 10px; border: 1px solid var(--linha); }
+    .corpo-post td { padding: 8px 10px; border: 1px solid var(--linha); vertical-align: top; }
+    .corpo-post li { margin: 6px 0; }
+  </style>
+</Base>

@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro'
+import { q } from '../../lib/db.js'
+
+const { slug } = Astro.params
+const { rows } = await q(`select * from material where slug = $1 and ativo`, [slug])
+if (rows.length === 0) return new Response(null, { status: 404 })
+const material = rows[0]
+const erro = Astro.url.searchParams.get('erro')
+---
+<Base titulo={material.titulo} descricao={material.descricao} caminho={`/materiais/${material.slug}`}>
+  <h1>{material.titulo}</h1>
+  <p style="color:var(--suave);max-width:60ch">{material.descricao}</p>
+
+  <div class="cartao" style="max-width:480px;margin-top:20px">
+    <strong>Receba o PDF agora</strong>
+    {erro && <p style="color:#A83A32;margin:8px 0 0">{erro === 'email' ? 'Confira o e-mail digitado.' : 'Preencha nome e e-mail.'}</p>}
+    <form method="post" action="/api/leads">
+      <input type="hidden" name="material" value={material.slug} />
+      <label for="nome">Seu nome</label>
+      <input id="nome" name="nome" required maxlength="120" placeholder="João da Silva" />
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email" required maxlength="160" placeholder="voce@suatransportadora.com.br" />
+      <label for="whatsapp">WhatsApp <span style="font-weight:400;color:var(--suave)">(opcional)</span></label>
+      <input id="whatsapp" name="whatsapp" maxlength="20" placeholder="(11) 99999-0000" />
+      <p style="font-size:12.5px;color:var(--suave)">Usamos seus dados para enviar o material e novidades do RotaCTe.
+        Sem spam, e você sai da lista quando quiser.</p>
+      <button class="botao" type="submit" style="width:100%">Baixar o PDF</button>
+    </form>
+  </div>
+</Base>

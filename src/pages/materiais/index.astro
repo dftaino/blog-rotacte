@@ -1,0 +1,19 @@
+---
+import Base from '../../layouts/Base.astro'
+import { q } from '../../lib/db.js'
+const { rows: materiais } = await q(`select slug, titulo, descricao from material where ativo order by id`)
+---
+<Base titulo="Materiais gratuitos" descricao="Manuais e guias em PDF sobre emissao fiscal, reforma tributaria e gestao de frota." caminho="/materiais">
+  <h1>Materiais gratuitos</h1>
+  <p style="color:var(--suave)">Guias práticos em PDF. Deixe seu e-mail e o download começa na hora.</p>
+  <div style="display:grid;gap:14px;margin-top:22px">
+    {materiais.map((m) => (
+      <div class="cartao">
+        <h2 style="margin:0 0 6px;font-size:20px">{m.titulo}</h2>
+        <p style="margin:0 0 12px;color:var(--suave)">{m.descricao}</p>
+        <a class="botao" href={`/materiais/${m.slug}`}>Quero este material</a>
+      </div>
+    ))}
+    {materiais.length === 0 && <div class="cartao">Nenhum material disponível no momento.</div>}
+  </div>
+</Base>
