@@ -13,16 +13,27 @@ Registro **A** `blog` → IP da VPS (2.25.91.209). Conferir com
 
 ## 1. Banco (uma vez)
 
-    docker exec -it funilads-db-1 psql -U postgres -c \
+O superusuario do Postgres compartilhado e **`funil`** (nao `postgres` — esse
+papel nao existe la):
+
+    docker exec funilads-db-1 psql -U funil -d funilads -c \
       "create user rotacte_blog password 'SENHA-FORTE-AQUI'"
-    docker exec -it funilads-db-1 psql -U postgres -c \
+    docker exec funilads-db-1 psql -U funil -d funilads -c \
       "create database rotacte_blog owner rotacte_blog"
 
 ## 2. Codigo + configuracao
 
-    cd /home/aplicativos
-    git clone https://github.com/dftaino/blog-rotacte.git rotacte-blog   # ou enviar zip
-    cd rotacte-blog
+O repo e privado, entao a VPS nao clona sozinha — o caminho usado foi enviar o
+tarball do commit (mesmo jeito do blog do Reservya):
+
+    # na bancada
+    git archive --format=tar.gz -o /tmp/rotacte-blog.tar.gz HEAD
+    scp /tmp/rotacte-blog.tar.gz root@2.25.91.209:/tmp/
+
+    # na VPS
+    mkdir -p /home/aplicativos/rotacte-blog
+    tar xzf /tmp/rotacte-blog.tar.gz -C /home/aplicativos/rotacte-blog
+    cd /home/aplicativos/rotacte-blog
     cp .env.example .env
     # preencher: DB_PASSWORD, ADMIN_SENHA (>=12), PLATAFORMA_TOKEN (>=24)
     #   openssl rand -hex 24   # bom para os dois
@@ -69,9 +80,20 @@ isso, os leads do RotaCTe saem pelo CSV do `/admin/leads`.
 
 ## Atualizar depois
 
+    # bancada: git archive + scp (como no passo 2), depois na VPS:
     cd /home/aplicativos/rotacte-blog
-    git pull            # ou descompactar zip novo
+    tar xzf /tmp/rotacte-blog.tar.gz -C .
     docker compose up -d --build
+
+O `.env` fica de fora do tarball (esta no .gitignore), entao a atualizacao nao
+apaga os segredos.
+
+## Estado (deploy de 27/08/2026)
+
+No ar em **https://blog.rotacte.com.br** — container `rotacte-blog-blog-1` na
+8007, certificado do certbot emitido, banco `rotacte_blog` semeado com os 3
+artigos e os 2 materiais. Senha do admin e tokens estao no `.env` da VPS
+(`/home/aplicativos/rotacte-blog/.env`, modo 600).
 
 ## O que fica onde
 
