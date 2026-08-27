@@ -6,15 +6,17 @@ import { q, garantirSchema } from '../src/lib/db.js'
 
 await garantirSchema()
 
+// Titulo e descricao do material sao do seed (o admin so acrescenta materiais
+// novos, nao edita esses textos) — por isso o conflito ATUALIZA em vez de ignorar.
 await q(
   `insert into material (slug, titulo, descricao, arquivo) values
    ('manual-rotacte', 'Manual completo do RotaCTe',
-    'O guia do sistema inteiro: CT-e, MDF-e, NF-e, frota, motoristas, financeiro e relatorios — com as telas reais e o passo a passo de cada emissao.',
+    'O guia do sistema inteiro: CT-e, MDF-e, NF-e, frota, motoristas, financeiro e relatórios — com as telas reais e o passo a passo de cada emissão.',
     'manual-rotacte.pdf'),
-   ('calendario-da-reforma-tributaria', 'Calendario da reforma tributaria para transportadoras',
-    'Uma pagina com o que muda em cada ano ate 2033, o que ja precisa estar no seu emissor e o checklist do que revisar antes de cada virada.',
+   ('calendario-da-reforma-tributaria', 'Calendário da reforma tributária para transportadoras',
+    'Uma página com o que muda em cada ano até 2033, o que já precisa estar no seu emissor e o checklist do que revisar antes de cada virada.',
     'calendario-reforma-transportadoras.pdf')
-   on conflict (slug) do nothing`,
+   on conflict (slug) do update set titulo = excluded.titulo, descricao = excluded.descricao`,
 )
 
 const posts = [
