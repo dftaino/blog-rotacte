@@ -1,12 +1,18 @@
 import crypto from 'node:crypto'
 import { q } from '../../lib/db.js'
+import { permitido, ipDoPedido } from '../../lib/limite.js'
 
 /**
  * Recebe o form do material e devolve o leitor direto para o download.
  * O lead ganha uma chave propria: e ela que libera o arquivo, entao o link
  * funciona de novo se a pessoa perder o PDF — sem refazer o cadastro.
  */
-export async function POST({ request, redirect }) {
+export async function POST({ request, redirect, clientAddress }) {
+  // Formulario publico: 5 envios por IP a cada 10 minutos ja atende gente de
+  // verdade (dois materiais, alguma repeticao) e corta robo de cadastro.
+  if (!permitido(`lead:${ipDoPedido(request, clientAddress)}`, 5, 10 * 60_000)) {
+    return new Response('Muitas tentativas seguidas. Tente de novo em alguns minutos.', { status: 429 })
+  }
   const form = await request.formData()
   const nome = String(form.get('nome') || '').trim().slice(0, 120)
   const email = String(form.get('email') || '').trim().toLowerCase().slice(0, 160)

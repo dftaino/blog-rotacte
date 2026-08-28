@@ -28,7 +28,10 @@ if (Astro.request.method === 'POST') {
       await q(`insert into material (slug, titulo, descricao, arquivo) values ($1,$2,$3,$4)`,
         [slug, titulo, descricao, nomeFisico])
       return Astro.redirect('/admin/materiais', 303)
-    } catch { erro = 'Ja existe um material com esse titulo/slug.' }
+    } catch {
+      erro = 'Ja existe um material com esse titulo/slug.'
+      try { fs.unlinkSync(path.join(RAIZ, nomeFisico)) } catch {}   // nao deixa PDF orfao no volume
+    }
   }
 }
 

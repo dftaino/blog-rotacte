@@ -18,7 +18,12 @@ export const q = (texto, params) => pool.query(texto, params)
 
 let pronto = null
 export function garantirSchema() {
-  if (!pronto) pronto = criar()
+  // Se a criacao falhar (banco ainda subindo, por exemplo), a promessa REJEITADA
+  // nao pode ficar em cache: sem o reset, todo request seguinte falharia mesmo
+  // depois de o banco voltar.
+  if (!pronto) {
+    pronto = criar().catch((e) => { pronto = null; throw e })
+  }
   return pronto
 }
 
@@ -39,6 +44,14 @@ async function criar() {
     -- Capa do post: caminho relativo dentro de ./arquivos (ver /capa/[...caminho]).
     alter table post add column if not exists capa text;
     alter table post add column if not exists capa_alt text;
+    -- Assunto do post (slug do catalogo em lib/categorias.js).
+    alter table post add column if not exists categoria text;
+    create index if not exists idx_post_categoria on post (categoria) where status = 'PUBLICADO';
+    -- Busca: um indice sobre titulo+resumo+conteudo em portugues (acento e plural
+    -- resolvidos pelo dicionario, em vez de LIKE que so acha a forma exata).
+    create index if not exists idx_post_busca on post using gin (
+      to_tsvector('portuguese', coalesce(titulo,'') || ' ' || coalesce(resumo,'') || ' ' || coalesce(conteudo_md,''))
+    );
     create table if not exists material (
       id        bigserial primary key,
       slug      text not null unique,

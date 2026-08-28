@@ -1,6 +1,7 @@
 ---
 import Admin from '../../../layouts/Admin.astro'
 import { q } from '../../../lib/db.js'
+import { CATEGORIAS, esquecerCategorias } from '../../../lib/categorias.js'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -28,8 +29,9 @@ async function salvarCapa(arquivo, slug) {
   return { caminho: relativo }
 }
 
-let post = { id: null, slug: '', titulo: '', resumo: '', conteudo_md: '', status: 'RASCUNHO', capa: null, capa_alt: '' }
+let post = { id: null, slug: '', titulo: '', resumo: '', conteudo_md: '', status: 'RASCUNHO', capa: null, capa_alt: '', categoria: '' }
 let erro = ''
+let capaNova = null   // arquivo gravado nesta requisicao (para apagar se o save falhar)
 
 if (Astro.request.method === 'POST') {
   const f = await Astro.request.formData()
@@ -38,6 +40,9 @@ if (Astro.request.method === 'POST') {
   const resumo = String(f.get('resumo') || '').trim()
   const conteudo = String(f.get('conteudo') || '')
   const capaAlt = String(f.get('capa_alt') || '').trim().slice(0, 200)
+  // Categoria so entra se estiver no catalogo — nada de assunto digitado a mao.
+  const enviada = String(f.get('categoria') || '')
+  const categoria = CATEGORIAS.some((c) => c.slug === enviada) ? enviada : null
   const capaEnviada = f.get('capa')
   const removerCapa = f.get('remover_capa') === 'on'
   const publicar = f.get('acao') === 'publicar'
@@ -53,41 +58,45 @@ if (Astro.request.method === 'POST') {
 
   if (!titulo || !slug) {
     erro = 'Titulo e obrigatorio.'
-    post = { ...post, titulo, slug, resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt }
+    post = { ...post, titulo, slug, resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt, categoria }
   } else if (['admin', 'materiais', 'api', 'baixar', 'capa', 'rss.xml', 'sitemap.xml', 'robots.txt'].includes(slug)) {
     erro = `O endereco /${slug} e reservado do sistema — escolha outro.`
-    post = { ...post, titulo, slug: '', resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt }
+    post = { ...post, titulo, slug: '', resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt, categoria }
   } else {
     if (capaEnviada instanceof File && capaEnviada.size > 0) {
       const r = await salvarCapa(capaEnviada, slug)
       if (r.erro) erro = r.erro
-      else capa = r.caminho
+      else { capa = r.caminho; capaNova = r.caminho }
     }
     if (!erro) {
       try {
         if (novo) {
           const r = await q(
-            `insert into post (slug, titulo, resumo, conteudo_md, capa, capa_alt, status, publicado_em)
-             values ($1,$2,$3,$4,$5,$6,$7,$8) returning id`,
-            [slug, titulo, resumo, conteudo, capa, capaAlt,
+            `insert into post (slug, titulo, resumo, conteudo_md, capa, capa_alt, categoria, status, publicado_em)
+             values ($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`,
+            [slug, titulo, resumo, conteudo, capa, capaAlt, categoria,
               publicar ? 'PUBLICADO' : 'RASCUNHO', publicar ? new Date() : null],
           )
+          esquecerCategorias()
           return Astro.redirect(`/admin/posts/${r.rows[0].id}`, 303)
         }
         await q(
-          `update post set slug=$1, titulo=$2, resumo=$3, conteudo_md=$4, capa=$5, capa_alt=$6,
-             status = case when $7 then 'PUBLICADO' when $8 then 'RASCUNHO' else status end,
-             publicado_em = case when $7 and publicado_em is null then now() else publicado_em end,
+          `update post set slug=$1, titulo=$2, resumo=$3, conteudo_md=$4, capa=$5, capa_alt=$6, categoria=$7,
+             status = case when $8 then 'PUBLICADO' when $9 then 'RASCUNHO' else status end,
+             publicado_em = case when $8 and publicado_em is null then now() else publicado_em end,
              atualizado_em = now()
-           where id = $9`,
-          [slug, titulo, resumo, conteudo, capa, capaAlt, publicar, despublicar, Number(id)],
+           where id = $10`,
+          [slug, titulo, resumo, conteudo, capa, capaAlt, categoria, publicar, despublicar, Number(id)],
         )
+        esquecerCategorias()
         return Astro.redirect(`/admin/posts/${id}`, 303)
       } catch (e) {
         erro = String(e.message).includes('unique') ? `Ja existe um post em /${slug}.` : 'Nao foi possivel salvar.'
+        // Post recusado com capa nova: apaga o arquivo, senao fica lixo no volume.
+        if (capaNova) { try { fs.unlinkSync(path.join(RAIZ, capaNova)) } catch {} }
       }
     }
-    post = { ...post, titulo, slug, resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt }
+    post = { ...post, titulo, slug, resumo, conteudo_md: conteudo, capa, capa_alt: capaAlt, categoria }
   }
 } else if (!novo) {
   const { rows } = await q(`select * from post where id = $1`, [Number(id)])
@@ -108,6 +117,13 @@ if (Astro.request.method === 'POST') {
     <input id="slug" name="slug" maxlength="80" value={post.slug} placeholder="5-causas-de-rejeicao-no-cte" />
     <label for="resumo">Resumo <span style="font-weight:400;color:var(--suave)">— aparece na home, no Google e no RSS</span></label>
     <input id="resumo" name="resumo" maxlength="200" value={post.resumo} placeholder="Uma frase que faz querer clicar." />
+    <label for="categoria">Assunto <span style="font-weight:400;color:var(--suave)">— define a etiqueta do card e a barra do topo</span></label>
+    <select id="categoria" name="categoria">
+      <option value="">(sem assunto)</option>
+      {CATEGORIAS.map((c) => (
+        <option value={c.slug} selected={post.categoria === c.slug}>{c.nome}</option>
+      ))}
+    </select>
 
     <fieldset style="border:1px solid var(--linha); border-radius:12px; padding:6px 16px 16px; margin:18px 0 0">
       <legend style="font-weight:700; font-size:13.5px; padding:0 6px">Capa</legend>

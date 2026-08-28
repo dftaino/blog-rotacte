@@ -1,11 +1,12 @@
 ---
 import { senhaConfere, cookieDeSessao, sessaoValida, podeTentar, registrarFalha } from '../../lib/admin.js'
+import { ipDoPedido } from '../../lib/limite.js'
 
 if (sessaoValida(Astro.cookies)) return Astro.redirect('/admin', 303)
 
 let erro = ''
 if (Astro.request.method === 'POST') {
-  const ip = Astro.clientAddress || 'local'
+  const ip = ipDoPedido(Astro.request, Astro.clientAddress)
   if (!podeTentar(ip)) {
     erro = 'Muitas tentativas. Aguarde 10 minutos.'
   } else {

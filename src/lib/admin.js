@@ -28,13 +28,16 @@ export function sessaoValida(cookies) {
     crypto.timingSafeEqual(Buffer.from(v), Buffer.from(esperado))
 }
 
-/** Trava de tentativas do login: 10 falhas por IP a cada 10 minutos. */
+/**
+ * Trava de tentativas do login: 10 falhas por IP a cada 10 minutos. Aqui a
+ * contagem e propria (e nao a do lib/limite.js) porque so a falha conta: abrir
+ * a tela de login nao pode gastar tentativa de quem sabe a senha.
+ */
 const falhas = new Map()
 export function podeTentar(ip) {
   const agora = Date.now()
-  const f = falhas.get(ip) || []
-  const recentes = f.filter((t) => agora - t < 10 * 60_000)
-  falhas.set(ip, recentes)
+  const recentes = (falhas.get(ip) || []).filter((t) => agora - t < 10 * 60_000)
+  if (recentes.length) falhas.set(ip, recentes); else falhas.delete(ip)
   return recentes.length < 10
 }
 export function registrarFalha(ip) {
@@ -42,3 +45,10 @@ export function registrarFalha(ip) {
   f.push(Date.now())
   falhas.set(ip, f)
 }
+// Faxina: IP que errou e sumiu nao pode ficar na memoria para sempre.
+setInterval(() => {
+  const agora = Date.now()
+  for (const [ip, marcas] of falhas) {
+    if (!marcas.length || agora - marcas[marcas.length - 1] > 10 * 60_000) falhas.delete(ip)
+  }
+}, 10 * 60_000).unref?.()

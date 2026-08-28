@@ -22,7 +22,8 @@ await q(
 const posts = [
   {
     slug: 'cte-rejeitado-como-ler-o-retorno-da-sefaz',
-    capa: 'capas/cte-rejeitado.png',
+    categoria: 'cte',
+    capa: 'capas/cte-rejeitado.webp',
     capaAlt: 'XML de CT-e com carimbo de rejeitado, ao lado dos tres desfechos possiveis do retorno da SEFAZ: autorizado, rejeicao e denegacao.',
     titulo: 'CT-e rejeitado: como ler o retorno da SEFAZ e resolver o que mais trava a emissão',
     resumo: 'A SEFAZ nunca recusa em silêncio: vem sempre um código e um motivo. Entenda a diferença entre rejeição, denegação e serviço fora do ar — e corrija os tropeços mais comuns.',
@@ -75,7 +76,8 @@ O RotaCTe valida o documento contra os esquemas oficiais antes de enviar, guarda
   },
   {
     slug: 'reforma-tributaria-no-transporte-o-que-muda',
-    capa: 'capas/reforma-tributaria.png',
+    categoria: 'reforma-tributaria',
+    capa: 'capas/reforma-tributaria.webp',
     capaAlt: 'Linha do tempo da reforma tributaria: 2026 ano de teste, 2027 CBS, 2029 a 2032 transicao e 2033 modelo pleno.',
     titulo: 'Reforma tributária no transporte: o que muda no CT-e e na NF-e, e quando',
     resumo: 'IBS e CBS entram no lugar de cinco tributos, e a mudança chega primeiro no documento fiscal. O calendário, os campos novos e o que fazer agora para não parar de emitir na virada.',
@@ -126,7 +128,8 @@ O RotaCTe já emite com os grupos de IBS/CBS da fase de teste e acompanha as Not
   },
   {
     slug: 'mdfe-quando-e-obrigatorio-e-o-encerramento',
-    capa: 'capas/mdfe-encerramento.png',
+    categoria: 'mdfe',
+    capa: 'capas/mdfe-encerramento.webp',
     capaAlt: 'Caminhao carregado de documentos na estrada, entre o ponto de origem e a bandeira de encerramento da viagem.',
     titulo: 'MDF-e: quando é obrigatório e por que o encerramento é o passo que mais dá dor de cabeça',
     resumo: 'O manifesto tem começo e fim — e é o fim que trava a frota. Entenda quando emitir, quais eventos existem e por que um MDF-e esquecido em aberto impede a próxima viagem.',
@@ -177,12 +180,22 @@ for (const p of posts) {
   // A capa e reaplicada num blog que ja existe (o post veio antes das ilustracoes),
   // mas so quando esta faltando — texto editado no admin nunca e sobrescrito.
   await q(
-    `insert into post (slug, titulo, resumo, conteudo_md, capa, capa_alt, status, publicado_em)
-     values ($1,$2,$3,$4,$5,$6,'PUBLICADO', now())
-     on conflict (slug) do update set capa = excluded.capa, capa_alt = excluded.capa_alt
-     where post.capa is null`,
-    [p.slug, p.titulo, p.resumo, p.md, p.capa, p.capaAlt],
+    `insert into post (slug, titulo, resumo, conteudo_md, capa, capa_alt, categoria, status, publicado_em)
+     values ($1,$2,$3,$4,$5,$6,$7,'PUBLICADO', now())
+     on conflict (slug) do update set
+       capa = coalesce(post.capa, excluded.capa),
+       capa_alt = coalesce(post.capa_alt, excluded.capa_alt),
+       categoria = coalesce(post.categoria, excluded.categoria)`,
+    [p.slug, p.titulo, p.resumo, p.md, p.capa, p.capaAlt, p.categoria],
   )
+}
+
+// O seed ja publicou estes posts com capa PNG; as capas viraram WEBP (metade do
+// peso). Troca so quem ainda aponta para o arquivo antigo do seed — capa enviada
+// pelo admin nao e tocada.
+for (const p of posts) {
+  await q(`update post set capa = $1 where slug = $2 and capa = $3`,
+    [p.capa, p.slug, p.capa.replace('.webp', '.png')])
 }
 
 const { rows } = await q(`select count(*)::int p from post`)

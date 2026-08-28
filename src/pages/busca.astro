@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro'
+import { q } from '../lib/db.js'
+import { CATEGORIAS } from '../lib/categorias.js'
+import ListaDePosts from '../componentes/ListaDePosts.astro'
+
+const termo = (Astro.url.searchParams.get('q') || '').trim().slice(0, 80)
+
+/**
+ * Busca em dois caminhos, unidos na mesma consulta:
+ *  1. full-text em portugues (o dicionario resolve plural e conjugacao);
+ *  2. trecho literal com hifen e ponto removidos dos DOIS lados — e assim que
+ *     quem digita "cte" acha "CT-e", que o dicionario tokeniza de outro jeito.
+ * Ordem: titulo que COMECA com o termo, depois titulo que apenas o contem, depois
+ * relevancia do full-text, depois o mais novo. Sem isso, buscar "cte" devolvia na
+ * frente o artigo de reforma (que cita CT-e no titulo) em vez do artigo de CT-e.
+ */
+let posts = []
+if (termo) {
+  const alvo = `coalesce(titulo,'') || ' ' || coalesce(resumo,'') || ' ' || coalesce(conteudo_md,'')`
+  const semSinal = (t) => `replace(replace(replace(lower(${t}), '-', ''), '.', ''), ' ', '')`
+  const { rows } = await q(
+    `select slug, titulo, resumo, publicado_em, capa, capa_alt, categoria,
+            ts_rank(to_tsvector('portuguese', ${alvo}), plainto_tsquery('portuguese', $1)) rank
+     from post
+     where status = 'PUBLICADO' and (
+       to_tsvector('portuguese', ${alvo}) @@ plainto_tsquery('portuguese', $1)
+       or ${semSinal(alvo)} like '%' || ${semSinal('$1')} || '%'
+     )
+     order by (case
+                 when ${semSinal('titulo')} like ${semSinal('$1')} || '%' then 2
+                 when ${semSinal('titulo')} like '%' || ${semSinal('$1')} || '%' then 1
+                 else 0 end) desc,
+              rank desc, publicado_em desc
+     limit 30`,
+    [termo],
+  )
+  posts = rows
+}
+const plural = posts.length === 1 ? 'resultado' : 'resultados'
+---
+<Base titulo={termo ? `Busca: ${termo}` : 'Busca'}
+      descricao="Busque por assunto no blog do RotaCTe." caminho="/busca">
+  <h1>{termo ? `Busca por “${termo}”` : 'O que você procura?'}</h1>
+
+  {termo && (
+    <p style="color:var(--suave)">
+      {posts.length === 0
+        ? 'Nenhum artigo encontrado. Tente outra palavra — ou veja os assuntos abaixo.'
+        : `${posts.length} ${plural}.`}
+    </p>
+  )}
+
+  {!termo && (
+    <p style="color:var(--suave)">Digite na busca lá em cima, ou escolha um assunto:</p>
+  )}
+
+  {(!termo || posts.length === 0) && (
+    <div class="assuntos-sugeridos">
+      {CATEGORIAS.map((c) => (
+        <a class="botao secundario" href={`/categoria/${c.slug}`}>{c.nome}</a>
+      ))}
+    </div>
+  )}
+
+  <ListaDePosts posts={posts} vazio="" />
+
+  <style>
+    .assuntos-sugeridos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .assuntos-sugeridos .botao { font-size: 14px; padding: 8px 15px; }
+  </style>
+</Base>

@@ -1,6 +1,7 @@
 ---
 import Admin from '../../layouts/Admin.astro'
 import { q } from '../../lib/db.js'
+import { dataCurtaBr } from '../../lib/datas.js'
 
 const [hoje, mes, top, porDia, leads] = await Promise.all([
   q(`select coalesce(sum(acessos),0)::int total from pageview where dia = current_date`),
@@ -13,7 +14,6 @@ const [hoje, mes, top, porDia, leads] = await Promise.all([
             count(*) filter (where criado_em >= now() - interval '30 days')::int mes from lead`),
 ])
 const maiorDia = Math.max(1, ...porDia.rows.map((d) => d.acessos))
-const dataBr = (d) => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
 ---
 <Admin titulo="Metricas">
   <h1>Métricas</h1>
@@ -28,7 +28,7 @@ const dataBr = (d) => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', 
     <strong>Acessos por dia (30 dias)</strong>
     <div style="display:flex;align-items:flex-end;gap:3px;height:90px;margin-top:12px">
       {porDia.rows.map((d) => (
-        <div title={`${dataBr(d.dia)}: ${d.acessos}`}
+        <div title={`${dataCurtaBr(d.dia)}: ${d.acessos}`}
           style={`flex:1;background:#b8860b;border-radius:3px 3px 0 0;height:${Math.max(4, Math.round((d.acessos / maiorDia) * 90))}px`} />
       ))}
       {porDia.rows.length === 0 && <span style="color:var(--suave);font-size:13.5px">Sem acessos registrados ainda.</span>}

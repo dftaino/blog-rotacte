@@ -1,0 +1,54 @@
+---
+/**
+ * Lista de artigos em card — a mesma na home, na categoria e na busca, para que
+ * os tres lugares nao comecem a divergir no dia em que o card mudar.
+ */
+import { nomeDaCategoria } from '../lib/categorias.js'
+import { dataBr } from '../lib/datas.js'
+
+const { posts, vazio = 'Nada por aqui ainda.' } = Astro.props
+---
+{posts.length === 0 && <div class="cartao">{vazio}</div>}
+
+<div class="lista-posts">
+  {posts.map((p, i) => (
+    <article class="cartao cartao-post">
+      {p.capa && (
+        /* O link da imagem repete o link do titulo: fica fora da ordem de foco e
+           invisivel ao leitor de tela, senao vira um link sem rotulo. */
+        <a href={`/${p.slug}`} class="capa-link" tabindex="-1" aria-hidden="true">
+          <img src={`/capa/${p.capa}`} alt={p.capa_alt || ''} width="1200" height="630"
+               loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />
+        </a>
+      )}
+      <div class="miolo-post">
+        <div class="linha-meta">
+          {p.categoria && nomeDaCategoria(p.categoria) && (
+            <a class="etiqueta" href={`/categoria/${p.categoria}`}>{nomeDaCategoria(p.categoria)}</a>
+          )}
+          <span class="rotulo-data">{dataBr(p.publicado_em)}</span>
+        </div>
+        <h2><a href={`/${p.slug}`}>{p.titulo}</a></h2>
+        <p class="resumo">{p.resumo}</p>
+        <p style="margin:12px 0 0"><a href={`/${p.slug}`}>Ler o artigo →</a></p>
+      </div>
+    </article>
+  ))}
+</div>
+
+<style>
+  .lista-posts { display: flex; flex-direction: column; gap: 14px; margin-top: 26px; }
+  /* Card com capa: a imagem encosta na borda, o texto mantem o respiro do cartao. */
+  .cartao-post { padding: 0; overflow: hidden; }
+  .capa-link { display: block; line-height: 0; border-bottom: 1px solid var(--linha); }
+  .capa-link img { width: 100%; height: auto; display: block; }
+  .miolo-post { padding: 20px 24px 22px; }
+  .linha-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .etiqueta { background: var(--neutro); border: 1px solid var(--linha-forte); color: var(--espresso);
+    font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; text-decoration: none; }
+  .etiqueta:hover { background: #ece3cf; }
+  .miolo-post h2 { margin: 8px 0; font-size: 21px; }
+  .miolo-post h2 a { text-decoration: none; color: var(--espresso); }
+  .miolo-post h2 a:hover { color: var(--marca-escura); }
+  .resumo { margin: 0; color: var(--suave); }
+</style>
