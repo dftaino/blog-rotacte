@@ -8,14 +8,9 @@ const { rows: posts } = await q(
    where status = 'PUBLICADO' order by publicado_em desc limit 30`,
 )
 ---
-<Base titulo="" caminho="/">
-  <h1>Documento fiscal e frota, explicados sem juridiquês</h1>
-  <p style="color:var(--suave);max-width:62ch">
-    CT-e, MDF-e, reforma tributária, CIOT e custo por quilômetro — o que o dono de transportadora
-    precisa saber para não travar a emissão nem perder dinheiro na estrada. Escrito por quem
-    desenvolve o RotaCTe.
-  </p>
-
+<Base titulo="" caminho="/"
+      heroTitulo="Documento fiscal e frota, explicados sem juridiquês"
+      heroTexto="CT-e, MDF-e, reforma tributária, CIOT e custo por quilômetro — o que o dono de transportadora precisa saber para não travar a emissão nem perder dinheiro na estrada. Escrito por quem desenvolve o RotaCTe.">
   <ListaDePosts posts={posts}
     vazio="Os primeiros artigos estão a caminho. Enquanto isso, veja os materiais gratuitos." />
 </Base>

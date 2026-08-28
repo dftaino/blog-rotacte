@@ -40,20 +40,13 @@ if (termo) {
 const plural = posts.length === 1 ? 'resultado' : 'resultados'
 ---
 <Base titulo={termo ? `Busca: ${termo}` : 'Busca'}
-      descricao="Busque por assunto no blog do RotaCTe." caminho="/busca">
-  <h1>{termo ? `Busca por “${termo}”` : 'O que você procura?'}</h1>
-
-  {termo && (
-    <p style="color:var(--suave)">
-      {posts.length === 0
-        ? 'Nenhum artigo encontrado. Tente outra palavra — ou veja os assuntos abaixo.'
-        : `${posts.length} ${plural}.`}
-    </p>
-  )}
-
-  {!termo && (
-    <p style="color:var(--suave)">Digite na busca lá em cima, ou escolha um assunto:</p>
-  )}
+      descricao="Busque por assunto no blog do RotaCTe." caminho="/busca"
+      heroTitulo={termo ? `Busca por “${termo}”` : 'O que você procura?'}
+      heroTexto={termo
+        ? (posts.length === 0
+            ? 'Nenhum artigo encontrado. Tente outra palavra — ou veja os assuntos abaixo.'
+            : `${posts.length} ${plural}.`)
+        : 'Digite na busca lá em cima, ou escolha um assunto:'}>
 
   {(!termo || posts.length === 0) && (
     <div class="assuntos-sugeridos">

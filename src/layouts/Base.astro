@@ -15,6 +15,8 @@ const {
   caminho = '/',
   tipo = 'website',
   imagem = null,   // caminho da capa dentro de ./arquivos (vira og:image absoluto)
+  heroTitulo = null,   // titulo sobre a foto do header (paginas de listagem)
+  heroTexto = null,
 } = Astro.props
 const site = (import.meta.env.SITE_URL || process.env.SITE_URL || 'https://blog.rotacte.com.br').replace(/\/$/, '')
 const canonico = site + caminho
@@ -62,7 +64,18 @@ const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
     body { margin: 0; font-family: 'Open Sans', system-ui, sans-serif; background: var(--fundo); color: var(--texto); line-height: 1.65; }
     a { color: var(--marca-escura); }
 
-    .topo-blog { background: var(--espresso); color: #fff; border-bottom: 3px solid var(--marca); }
+    /* Foto no header: a mesma rodovia noturna do acervo da marca, sob um veu
+       escuro. O veu e forte em cima (onde ficam logotipo, busca e assuntos, que
+       precisam de contraste) e vai clareando ate a faixa do titulo, onde a foto
+       aparece de verdade. Logotipo sobre foto e sempre a versao branca. */
+    .topo-blog { background: var(--espresso) url('/img/header-rodovia.webp') center 62% / cover no-repeat;
+      color: #fff; border-bottom: 3px solid var(--marca); }
+    .topo-blog > * { position: relative; z-index: 1; }
+    .topo-blog { position: relative; isolation: isolate; }
+    .topo-blog::before { content: ''; position: absolute; inset: 0; z-index: 0;
+      background:
+        linear-gradient(90deg, rgba(21,18,14,.92) 0%, rgba(21,18,14,.70) 52%, rgba(21,18,14,.28) 100%),
+        linear-gradient(180deg, rgba(21,18,14,.90) 0%, rgba(21,18,14,.55) 46%, rgba(21,18,14,.22) 100%); }
     .topo-blog .topo-linha { display: flex; align-items: center; gap: 16px; padding: 13px 18px; }
     .topo-blog .marca { display: flex; align-items: center; gap: 9px; text-decoration: none; }
     .topo-blog .marca svg { height: 25px; width: auto; display: block; }
@@ -89,7 +102,7 @@ const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
     .busca button:hover { background: #2e2a22; }
 
     /* Barra de assuntos: rola na horizontal no celular, sem virar menu escondido. */
-    .barra-assuntos { background: #2e2a22; border-top: 1px solid #3c352c; }
+    .barra-assuntos { background: rgba(46,42,34,.55); border-top: 1px solid rgba(120,108,90,.35); }
     .barra-assuntos .trilho { display: flex; gap: 8px; overflow-x: auto; padding: 9px 18px;
       scrollbar-width: none; }
     .barra-assuntos .trilho::-webkit-scrollbar { display: none; }
@@ -98,6 +111,11 @@ const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
     .barra-assuntos a:hover { background: #3c352c; color: #fff; }
     .barra-assuntos a[aria-current] { background: var(--ouro); color: var(--sobre-ouro); }
     .barra-assuntos a.destaque { border-color: #5a5142; color: var(--marca-clara); }
+
+    /* Faixa do titulo, ainda dentro do header: e onde a foto fica mais visivel. */
+    .capa-hero { padding: 44px 18px 52px; }
+    .capa-hero h1 { color: #fff; margin: 0 0 8px; text-shadow: 0 2px 18px rgba(0,0,0,.55); }
+    .capa-hero p { margin: 0; color: #e0d7c6; max-width: 60ch; text-shadow: 0 1px 12px rgba(0,0,0,.5); }
 
     .miolo { max-width: 860px; margin: 0 auto; padding: 0 18px; }
     main.miolo { padding-top: 34px; padding-bottom: 62px; }
@@ -116,6 +134,11 @@ const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
     input:focus, textarea:focus { outline: 2px solid var(--marca-clara); outline-offset: 1px; border-color: var(--marca); }
     label { font-weight: 600; font-size: 14px; display: block; margin: 14px 0 5px; }
     @media (max-width: 760px) {
+      /* No celular nao ha largura para separar texto e foto lado a lado: o veu
+         fica mais fechado e a foto volta a ser textura, nao concorrente. */
+      .topo-blog::before { background: linear-gradient(180deg, rgba(21,18,14,.95) 0%,
+        rgba(21,18,14,.84) 48%, rgba(21,18,14,.66) 100%); }
+      .capa-hero { padding: 30px 18px 36px; }
       .topo-nav a.some-mobile { display: none; }
       .topo-blog .marca .selo { display: none; }
       .topo-blog .miolo.topo-linha { flex-wrap: wrap; row-gap: 10px; }
@@ -165,6 +188,12 @@ const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
            aria-current={rotaAtual === '/materiais' ? 'page' : undefined}>Materiais gratuitos</a>
       </div>
     </nav>
+    {heroTitulo && (
+      <div class="miolo capa-hero">
+        <h1>{heroTitulo}</h1>
+        {heroTexto && <p>{heroTexto}</p>}
+      </div>
+    )}
   </header>
   <main class="miolo">
     <slot />

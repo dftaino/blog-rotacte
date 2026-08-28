@@ -6,10 +6,9 @@ const { rows: recentes } = await q(
   `select slug, titulo from post where status = 'PUBLICADO' order by publicado_em desc limit 4`,
 )
 ---
-<Base titulo="Página não encontrada" caminho="/404">
-  <h1>Essa página não existe</h1>
-  <p style="color:var(--suave);max-width:60ch">O endereço pode ter mudado, ou o artigo ainda não foi publicado.
-    Use a busca lá em cima ou comece por um destes:</p>
+<Base titulo="Página não encontrada" caminho="/404"
+      heroTitulo="Essa página não existe"
+      heroTexto="O endereço pode ter mudado, ou o artigo ainda não foi publicado. Use a busca lá em cima ou comece por um destes:">
   <ul style="margin-top:16px">
     {recentes.map((r) => (<li style="margin:8px 0"><a href={`/${r.slug}`}>{r.titulo}</a></li>))}
   </ul>

@@ -16,12 +16,10 @@ const { rows: posts } = await q(
 ---
 <Base titulo={categoria.nome}
       descricao={`Artigos sobre ${categoria.nome} para transportadoras: o que muda, o que trava a emissão e como resolver.`}
-      caminho={`/categoria/${categoria.slug}`}>
-  <h1>{categoria.nome}</h1>
-  <p style="color:var(--suave)">
-    {posts.length === 0
-      ? 'Ainda não publicamos nada neste assunto — em breve.'
-      : `${posts.length} ${posts.length === 1 ? 'artigo' : 'artigos'} sobre ${categoria.nome}.`}
-  </p>
+      caminho={`/categoria/${categoria.slug}`}
+      heroTitulo={categoria.nome}
+      heroTexto={posts.length === 0
+        ? 'Ainda não publicamos nada neste assunto — em breve.'
+        : `${posts.length} ${posts.length === 1 ? 'artigo' : 'artigos'} sobre ${categoria.nome}.`}>
   <ListaDePosts posts={posts} />
 </Base>
