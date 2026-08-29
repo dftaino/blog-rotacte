@@ -174,6 +174,71 @@ O encerramento é rápido e é justamente por isso que se esquece: ele acontece 
 
 No RotaCTe o manifesto nasce da viagem, não de um formulário em branco: os documentos da carga já entram na lista e o percurso vem da rota. O **Encerrar** fica no próprio card do manifesto autorizado, com município, UF e data já preenchidos a partir do que foi manifestado — encerrar deixa de ser um formulário e vira uma confirmação.`,
   },
+  {
+    slug: 'quem-precisa-emitir-cte-e-quando',
+    categoria: 'cte',
+    capa: 'capas/quem-emite-cte.webp',
+    capaAlt: 'Tres situacoes e seus documentos: carga de terceiro usa CT-e, carga propria usa NF-e com MDF-e, e entrega municipal usa NFS-e.',
+    titulo: "Quem precisa emitir CT-e — e quando",
+    resumo: "Transportou carga de terceiro, cobrando pelo frete? CT-e. Carga própria? NF-e e MDF-e. Dentro do município? Outra nota. O guia direto de quem emite, quem não emite e a hora certa.",
+    md: `A dúvida chega todo dia, de quem está abrindo transportadora e de quem já roda há anos: afinal, quem é obrigado a emitir CT-e? A resposta cabe numa regra de bolso — e o resto do artigo trata das exceções, que é onde mora a multa.
+
+## A regra de bolso
+
+**Transportou carga de outra pessoa, cobrando pelo serviço → CT-e.** O Conhecimento de Transporte eletrônico (modelo 57) é o documento fiscal da *prestação de serviço* de transporte de carga. Existe prestação quando alguém paga você para levar uma mercadoria que não é sua.
+
+**Levou mercadoria própria, no seu veículo → não há CT-e**, porque não há serviço prestado a ninguém. O transporte roda acobertado pela NF-e da mercadoria — e pelo MDF-e, quando a viagem exige o manifesto.
+
+Se você guardar só esses dois parágrafos, já erra menos que muita gente.
+
+## Quem emite
+
+- **Transportadoras (ETC)** — empresas de transporte rodoviário de carga, registradas na ANTT. É o caso clássico: cliente contrata, mercadoria de terceiro na carroceria, CT-e para cada prestação.
+- **Cooperativas de transporte**, na mesma lógica.
+- **Todos os modais.** O CT-e não é só do caminhão: rodoviário, aéreo, aquaviário, ferroviário e dutoviário usam o mesmo documento — ele aposentou os conhecimentos em papel, incluindo o velho CTRC.
+- **Transporte de pessoas, valores ou excesso de bagagem** tem um irmão próprio: o **CT-e OS (modelo 67)**, com formulário reduzido — só tomador, descrição do serviço e valores.
+
+## Quem não emite
+
+**Quem carrega carga própria.** A indústria que leva produto para a filial, o atacado que entrega com frota própria, o produtor que escoa a safra no próprio caminhão: em todos esses casos o documento da mercadoria é a NF-e, e o da viagem, quando aplicável, é o MDF-e. Emitir CT-e aí seria documentar um serviço que não existe.
+
+**O caminhoneiro autônomo (TAC).** Pessoa física não emite CT-e. Quem resolve o documento é quem contratou: se uma transportadora subcontrata o autônomo, ela emite o CT-e da prestação — e declara o frete pago a ele no CIOT, junto à ANTT. Se um embarcador contrata o autônomo direto, a forma de recolher o imposto varia por estado (substituição tributária, dispensa, regimes próprios) — esse é um caso para fechar com a contabilidade antes de rodar.
+
+**Quem transporta só dentro do município.** Frete estritamente municipal é serviço de ISS, imposto da prefeitura — o documento é a nota de serviço municipal (NFS-e), não o CT-e. O CT-e entra quando a prestação cruza município ou estado, território do ICMS.
+
+## Quando emitir
+
+**Antes de a carga sair.** O CT-e autorizado gera o DACTE, que viaja junto com a mercadoria — é ele que a fiscalização pede no posto. Emitir depois que o caminhão partiu é rodar descoberto no trecho em que mais importa.
+
+**Uma prestação, um CT-e.** Cada serviço contratado gera o seu documento, com remetente, destinatário e valor daquela prestação. Na carga fracionada isso significa vários CT-e na mesma viagem — e é o MDF-e que amarra todos ao veículo.
+
+E os casos que fogem do padrão têm caminho próprio:
+
+- **Subcontratação e redespacho**: quando uma transportadora passa o serviço a outra, o CT-e da subcontratada referencia o documento anterior. O passo a passo está na [central de ajuda](https://ajuda.rotacte.com.br/ct-e-de-subcontratacao-documento-anterior).
+- **Complementar**: cobrou a menos? Emite-se um CT-e de complemento de valor, sem cancelar o original.
+- **Anulação e substituição**: erro depois do prazo de cancelamento tem rito próprio, com um documento anulando e outro substituindo.
+- **Contingência**: SEFAZ fora do ar não para a operação — o CT-e sai pela SEFAZ Virtual e a viagem acontece.
+
+## A tabela de bolso
+
+| Situação | Documento |
+| --- | --- |
+| Transportadora leva carga de cliente entre cidades | CT-e (modelo 57) |
+| Indústria leva produto próprio à filial | NF-e + MDF-e |
+| Autônomo (TAC) rodando para transportadora | CT-e da transportadora + CIOT |
+| Entrega só dentro do município | NFS-e (ISS) |
+| Transporte de pessoas, valores ou bagagem | CT-e OS (modelo 67) |
+
+## O preço de rodar sem
+
+Mercadoria sem documento fiscal correto é retida no posto até regularizar — com o cliente esperando na outra ponta. Vem multa, que varia por estado e cresce quando a fiscalização entende que houve intenção. O tomador perde o crédito do imposto. E, num sinistro, a seguradora vai olhar a documentação da carga antes de olhar qualquer outra coisa.
+
+## Emitindo na prática
+
+No RotaCTe o CT-e nasce num quadro: rascunho, revisão e envio ao governo, com validação contra os esquemas oficiais antes de a SEFAZ ver o documento — erro aparece na sua tela, não no posto fiscal. Subcontratação, complementar, OS, Simplificado e contingência estão no mesmo formulário, e o [passo a passo completo está na central de ajuda](https://ajuda.rotacte.com.br/emitir-um-ct-e-completo), com a ação gravada em GIF. Se a SEFAZ recusar, [este guia ensina a ler o retorno](/cte-rejeitado-como-ler-o-retorno-da-sefaz).
+
+> Este artigo é informativo e reflete as regras gerais do CT-e. Situações de fronteira — autônomo contratado direto, regimes especiais, benefícios estaduais — variam por UF: confirme com a sua contabilidade antes de definir o fluxo fiscal da operação.`,
+  },
 ]
 
 for (const p of posts) {
