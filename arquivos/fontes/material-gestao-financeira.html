@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" />
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html,body { margin:0; padding:0; font-family:'Open Sans',system-ui,sans-serif; color:#2a2118; background:#fbf9f4; }
+  .doc { max-width:720px; margin:0 auto; }
+  .eyebrow { font-size:11px; font-weight:700; letter-spacing:2.5px; color:#9a7b1e; text-transform:uppercase; }
+  h1 { font-size:30px; font-weight:800; margin:6px 0 4px; color:#231f19; line-height:1.12; }
+  .sub { font-size:13.5px; color:#6b6152; margin:0 0 20px; max-width:60ch; line-height:1.5; }
+  .rule { height:3px; background:linear-gradient(90deg,#d0a63c,#b8860b 60%,#fbf9f4); border:0; margin:0 0 18px; border-radius:2px; }
+  .card { background:#fff; border:1px solid #ece3cf; border-left:4px solid #b8860b; border-radius:10px; padding:12px 16px 13px; margin:0 0 12px; break-inside:avoid; }
+  .card h2 { font-size:15.5px; font-weight:800; margin:0 0 4px; color:#231f19; }
+  .card h2 .n { display:inline-block; min-width:22px; color:#b8860b; }
+  .card p { font-size:12.5px; line-height:1.55; margin:0; color:#463d31; }
+  .card p b { color:#231f19; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 0; }
+  .chip { font-size:11px; font-weight:600; color:#5f5344; background:#f4eeda; border:1px solid #e6dcc0; border-radius:20px; padding:3px 10px; }
+  .chip.v { background:#fbf3dd; border-color:#e9d69a; color:#7a5e12; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:8px 0 0; }
+  .kpi { background:#231f19; color:#faf5e8; border-radius:8px; padding:9px 11px; }
+  .kpi b { display:block; font-size:12.5px; font-weight:800; color:#e8c976; }
+  .kpi span { font-size:10.5px; color:#c9bda6; line-height:1.35; display:block; margin-top:1px; }
+  .tie { background:#231f19; color:#f3ecdc; border-radius:10px; padding:14px 16px; margin:14px 0 10px; }
+  .tie h2 { color:#e8c976; font-size:15px; margin:0 0 5px; font-weight:800; }
+  .tie p { font-size:12.5px; line-height:1.55; margin:0; color:#ded3bd; }
+  .foot { font-size:10.5px; color:#8a8070; border-top:1px solid #ece3cf; margin-top:14px; padding-top:10px; line-height:1.5; }
+  .foot b { color:#6b6152; }
+</style></head>
+<body>
+<div class="doc">
+  <div class="eyebrow">Material gratuito · blog.rotacte.com.br</div>
+  <h1>Gestão financeira para transportadoras</h1>
+  <p class="sub">Frete rodando não é lucro no bolso. Este guia mostra, sem contabilês, como enxergar o dinheiro da transportadora — do custo de cada viagem ao caixa que sobra no fim do mês.</p>
+  <hr class="rule" />
+
+  <div class="card">
+    <h2><span class="n">1.</span> Separe o caixa da empresa do seu bolso</h2>
+    <p>O erro que esconde o lucro de mais transportadora é um só: pagar a conta de casa com o dinheiro do frete. Defina um <b>pró-labore fixo</b> — um salário seu, com data — e não tire mais nada por fora. Enquanto a empresa e o dono forem o mesmo caixa, você nunca vai saber se o negócio dá lucro ou só empurra.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">2.</span> Descubra o custo real por quilômetro</h2>
+    <p>Antes de aceitar um frete, você precisa saber quanto custa rodar. Some tudo o que o caminhão consome e divida pelos quilômetros do mês — esse é o seu <b>custo por km</b>. Frete que paga menos que isso dá prejuízo, por mais cheio que o dia pareça.</p>
+    <div class="chips">
+      <span class="chip v">Diesel</span><span class="chip v">Pneu</span><span class="chip v">Manutenção</span><span class="chip v">Pedágio</span><span class="chip v">Motorista</span>
+      <span class="chip">Seguro</span><span class="chip">Licenciamento</span><span class="chip">Depreciação</span><span class="chip">Administrativo</span>
+    </div>
+    <p style="margin-top:8px;font-size:11.5px;color:#7a6f5d">Os <b>dourados</b> variam com a viagem; os claros correm todo mês, o caminhão parado ou não — e é por eles que a frota parada sangra.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">3.</span> Fluxo de caixa: o dinheiro tem data</h2>
+    <p>O frete você entrega hoje, mas recebe em 30, 60 dias. O diesel, o pedágio e o salário não esperam. Esse <b>descasamento entre receber e pagar</b> é o que consome o capital de giro e obriga a antecipar recebível no susto. Anote toda entrada e saída com a <b>data</b> em que o dinheiro de fato entra ou sai — não a data da nota. É o calendário do caixa que evita o aperto no dia 10.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">4.</span> Cobre o frete como você emite o CT-e</h2>
+    <p>Todo CT-e é um valor a receber — trate assim desde o primeiro dia. Gere o <b>título junto com o documento</b>, mande boleto ou PIX na hora, e tenha uma régua de lembretes antes e depois do vencimento. Frete "esquecido" não é generosidade com o cliente: é capital de giro seu parado na mão dele. Acompanhe a <b>inadimplência</b> como um número, não como sensação.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">5.</span> Provisão: o que quebra transportadora</h2>
+    <p>Pneu e motor não mandam aviso — chegam de uma vez, e caro. O que derruba a frota não é o custo do dia a dia, é a conta grande que ninguém separou. <b>Guarde um valor por viagem</b> para manutenção, imposto e o 13º/férias do motorista. Uma reserva alimentada a cada frete transforma emergência em despesa prevista.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">6.</span> Os números que você olha toda semana</h2>
+    <p>Gestão financeira não é planilha gigante uma vez por ano — são poucos números, sempre.</p>
+    <div class="kpis">
+      <div class="kpi"><b>Custo por km</b><span>o piso de todo frete</span></div>
+      <div class="kpi"><b>Margem por rota</b><span>onde você ganha e onde só se cansa</span></div>
+      <div class="kpi"><b>Ciclo de caixa</b><span>recebe em X, paga em Y</span></div>
+      <div class="kpi"><b>Inadimplência</b><span>quanto do frete não voltou</span></div>
+      <div class="kpi"><b>A pagar da semana</b><span>o que vence nos próximos 7 dias</span></div>
+      <div class="kpi"><b>Reserva</b><span>quanto já há para o imprevisto</span></div>
+    </div>
+  </div>
+
+  <div class="tie">
+    <h2>Como o RotaCTe tira isso da planilha</h2>
+    <p>No RotaCTe o financeiro nasce do fiscal: cada CT-e autorizado já vira um <b>título a receber</b>, com boleto ou PIX e uma <b>régua de cobrança</b> que lembra o cliente sozinha. As contas a pagar entram no mesmo caixa, o <b>fluxo de caixa</b> mostra o que entra e sai por data, e a <b>rentabilidade por frete</b> revela qual viagem deu lucro de verdade — sem você digitar duas vezes.</p>
+  </div>
+
+  <div class="foot">
+    <b>Este material é informativo</b> e traz práticas gerais de gestão financeira. Regras tributárias e trabalhistas variam e mudam — confirme com a sua contabilidade antes de decidir o fluxo do seu negócio. · Feito por <b>RotaCTe</b> · blog.rotacte.com.br
+  </div>
+</div>
+</body></html>
