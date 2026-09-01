@@ -1,0 +1,47 @@
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" />
+<style>html,body{margin:0;padding:0;width:1200px;height:630px;overflow:hidden}</style></head>
+<body>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" font-family="Open Sans, sans-serif">
+  <defs>
+    <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d0a63c"/><stop offset=".55" stop-color="#b8860b"/><stop offset="1" stop-color="#946c08"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="80%" cy="14%" r="66%">
+      <stop offset="0" stop-color="#b8860b" stop-opacity=".30"/><stop offset="1" stop-color="#23201a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="s" x="-25%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity=".38"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="#23201a"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <text x="80" y="104" font-size="21" font-weight="700" fill="#c9bda6" letter-spacing="3">A REGRA MUDOU EM 2026</text>
+  <text x="80" y="168" font-size="46" font-weight="800" fill="#faf8f3">Frota própria precisa de CIOT?</text>
+
+  <!-- linha 1: frete pago com frota própria -> CIOT -->
+  <g transform="translate(80 240)" filter="url(#s)">
+    <rect width="1040" height="118" rx="16" fill="#2e2a22" stroke="#4b4438"/>
+    <text x="26" y="46" font-size="22" font-weight="700" fill="#faf8f3">Frete pago, mesmo no seu caminhão</text>
+    <text x="26" y="80" font-size="17" fill="#a99e8c">desde 24/05/2026, a operação de frete exige o código</text>
+    <path d="M770 59h58" stroke="#d0a63c" stroke-width="4" stroke-linecap="round"/>
+    <path d="M818 49l14 10-14 10" fill="none" stroke="#d0a63c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="856" y="29" width="158" height="60" rx="12" fill="url(#ouro)"/>
+    <text x="935" y="67" text-anchor="middle" font-size="25" font-weight="800" fill="#231f19">CIOT</text>
+  </g>
+
+  <!-- linha 2: carga própria + CLT -> sem CIOT -->
+  <g transform="translate(80 382)" filter="url(#s)">
+    <rect width="1040" height="118" rx="16" fill="#2e2a22" stroke="#4b4438"/>
+    <text x="26" y="46" font-size="22" font-weight="700" fill="#faf8f3">Carga própria, com motorista CLT</text>
+    <text x="26" y="80" font-size="17" fill="#a99e8c">movendo o que é seu — não há frete de terceiro</text>
+    <path d="M770 59h58" stroke="#8c8377" stroke-width="4" stroke-linecap="round"/>
+    <path d="M818 49l14 10-14 10" fill="none" stroke="#8c8377" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="856" y="29" width="158" height="60" rx="12" fill="#faf8f3"/>
+    <text x="935" y="67" text-anchor="middle" font-size="20" font-weight="800" fill="#23201a">sem CIOT</text>
+  </g>
+</svg>
+</body></html>
