@@ -81,10 +81,11 @@ async function criar() {
   `)
 }
 
-/** Soma 1 acesso na rota do dia. Uma linha por (dia, rota): a tabela nao cresce com o trafego. */
+/** Soma 1 acesso na rota do dia. Uma linha por (dia, rota): a tabela nao cresce com o trafego.
+ *  Dia no fuso de Sao Paulo (o container roda em UTC) — senao o "hoje" virava as 21h BRT. */
 export async function registrarAcesso(rota) {
   await q(
-    `insert into pageview (dia, rota, acessos) values (current_date, $1, 1)
+    `insert into pageview (dia, rota, acessos) values ((now() at time zone 'America/Sao_Paulo')::date, $1, 1)
      on conflict (dia, rota) do update set acessos = pageview.acessos + 1`,
     [rota],
   )
