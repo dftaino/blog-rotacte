@@ -31,6 +31,15 @@ marca traz o próprio LAYOUT, porque as duas identidades discordam no desenho, n
 ⚠️ A primeira versão disto era o layout do Reservya recolorido, e ficou com cara de peça
 emprestada — que é exatamente o que a identidade do RotaCTe existe para evitar.
 
+## A abertura (quadro 1)
+
+No Reservya ela sai do `gerar-capa.py --formato stories`: foto sangrando, véu e título em
+cima — o tratamento da casa de lá.
+
+No RotaCTe esse mesmo quadro seria uma peça do Reservya com outra cor, então ele nasce aqui:
+`--abertura <foto> --olho "..." --titulo "linha|linha"` monta a abertura no desenho ROTA
+(logotipo, título grande, foto em FAIXA com fio dourado, rota no ponto de partida).
+
 Precisa de google-chrome e Pillow. As fontes são os woff2 locais: sem rede.
 """
 import argparse
@@ -129,19 +138,17 @@ ESTILO_ROTACTE = """
 """
 
 
-def corpo_rotacte(paragrafos, passo, total):
-    """O trajeto anda com o story: quadro 1 de 5 = 20%, quadro 5 de 5 = fechado.
+def linha_rota(andado):
+    """A assinatura da marca: Coleta → anel → Contador, com `andado` de 0 a 1.
 
-    É o mesmo recurso do Reels da campanha, na velocidade do dedo de quem toca a tela em
-    vez da do vídeo. Quem chega ao último quadro vê a rota completa — e o último quadro é
-    justamente o da pergunta e do link.
+    O trajeto anda com o story — quadro 1 de 5 = 20%, quadro 5 de 5 = fechado. É o mesmo
+    recurso do Reels da campanha, na velocidade do dedo de quem toca a tela em vez da do
+    vídeo. Quem chega ao último quadro vê a rota completa, e o último quadro é justamente
+    o da pergunta e do link.
     """
-    p = max(0.06, min(1.0, passo / total))
+    p = max(0.06, min(1.0, andado))
     fim = "cheio" if p >= 0.999 else "vazio"
-    return f'''
-  <div class="lock"><img src="file://{MARCA_ROTACTE}/rotacte-logo-branco.svg"></div>
-  <div class="bloco">{paragrafos}</div>
-  <div class="rota">
+    return f'''<div class="rota">
     <div class="no cheio"></div><div class="rotulo">Coleta</div>
     <div class="trilho">
       <div class="apagado"><i></i></div>
@@ -151,6 +158,44 @@ def corpo_rotacte(paragrafos, passo, total):
     </div>
     <div class="no {fim}"></div><div class="rotulo">Contador</div>
   </div>'''
+
+
+def logotipo():
+    return f'<div class="lock"><img src="file://{MARCA_ROTACTE}/rotacte-logo-branco.svg"></div>'
+
+
+def corpo_rotacte(paragrafos, passo, total):
+    return (f'{logotipo()}<div class="bloco">{paragrafos}</div>'
+            f'{linha_rota(passo / total)}')
+
+
+ABERTURA_ROTACTE = """
+  .lock{position:absolute;left:88px;top:150px;}
+  .lock img{display:block;width:214px;height:62px;}
+  .olho{position:absolute;left:88px;right:88px;top:300px;font-size:21px;font-weight:700;
+        letter-spacing:.22em;text-transform:uppercase;color:#d0a63c;}
+  h1{position:absolute;left:88px;right:88px;top:370px;margin:0;font-size:76px;
+     font-weight:800;line-height:1.08;letter-spacing:-.02em;color:#faf8f3;}
+  .faixa{position:absolute;left:88px;right:88px;top:700px;height:660px;
+         border-top:3px solid #b8860b;background-size:cover;background-repeat:no-repeat;}
+"""
+
+
+def abertura_rotacte(foto, olho, titulo, posicao):
+    """Quadro 1 no desenho ROTA: a foto é FAIXA e o texto tem chão próprio.
+
+    A abertura do Reservya continua vindo do gerar-capa (foto sangrando + véu). Aqui isso
+    seria a peça do outro produto pintada de dourado — e foi assim que a primeira versão
+    saiu, com razão rejeitada.
+    """
+    linhas = "<br>".join(l.strip() for l in titulo.split("|") if l.strip())
+    return f'''
+  {logotipo()}
+  <div class="olho">{olho}</div>
+  <h1>{linhas}</h1>
+  <div class="faixa" style="background-image:url('file://{foto}');
+       background-position:{posicao};"></div>
+  {linha_rota(0)}'''
 
 
 LAYOUTS = {
@@ -208,6 +253,10 @@ def main():
     p.add_argument("--marca", required=True, choices=sorted(MARCAS))
     p.add_argument("roteiro", help="arquivos/stories-<slug>.md")
     p.add_argument("--qualidade", type=int, default=90)
+    p.add_argument("--abertura", help="foto do quadro 1 (só rotacte; no Reservya use o gerar-capa)")
+    p.add_argument("--olho", help="linha em versalete da abertura")
+    p.add_argument("--titulo", help="título da abertura; use | para quebrar a linha")
+    p.add_argument("--foco", default="center 40%", help="background-position da faixa de foto")
     a = p.parse_args()
 
     roteiro = pathlib.Path(a.roteiro)
@@ -221,8 +270,38 @@ def main():
     if not achados:
         sys.exit("nenhum quadro com texto de tela no roteiro")
 
+    if a.abertura and a.marca != "rotacte":
+        sys.exit("--abertura é do rotacte; a do Reservya sai do gerar-capa --formato stories")
+    if a.abertura and not (a.olho and a.titulo):
+        sys.exit("--abertura pede --olho e --titulo")
+
     from PIL import Image
     with tempfile.TemporaryDirectory() as tmp:
+        if a.abertura:
+            foto = pathlib.Path(a.abertura).resolve()
+            if not foto.exists():
+                sys.exit(f"foto não encontrada: {foto}")
+            m = MARCAS[a.marca]
+            pag = PAGINA.format(
+                L=L, A=A, margem=MARGEM, estilo=ESTILO_ROTACTE + ABERTURA_ROTACTE,
+                corpo=abertura_rotacte(foto, a.olho, a.titulo, a.foco),
+                fonte=m["fonte"], arquivo=m["arquivo"], fundo=m["fundo"], claro=m["claro"],
+                apoio=m["apoio"], pe=m["pe"], peso_destaque=m["peso_destaque"],
+                peso_corpo=m["peso_corpo"], aperto=m["aperto"], site=m["site"])
+            arq = pathlib.Path(tmp) / "q1.html"
+            arq.write_text(pag, encoding="utf-8")
+            png = pathlib.Path(tmp) / "q1.png"
+            subprocess.run(
+                ["google-chrome", "--headless", "--disable-gpu", "--no-sandbox",
+                 "--hide-scrollbars", "--allow-file-access-from-files",
+                 f"--window-size={L},{A}", f"--screenshot={png}",
+                 "--virtual-time-budget=6000", f"file://{arq}"],
+                check=True, capture_output=True, timeout=180)
+            fim = saida / f"stories-{slug}.jpg"
+            Image.open(png).convert("RGB").save(
+                fim, "JPEG", quality=a.qualidade, subsampling=0, optimize=True)
+            print(f"  {fim} · {fim.stat().st_size // 1024} KB · abertura")
+
         for passo, (n, falas) in enumerate(achados, start=1):
             arq = pathlib.Path(tmp) / f"q{n}.html"
             arq.write_text(html(falas, a.marca, passo, len(achados)), encoding="utf-8")

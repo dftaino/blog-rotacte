@@ -5,12 +5,25 @@ Seis quadros, **todos já renderizados** — nada para montar no app:
 
 | quadro | arquivo |
 |---|---|
-| 1 · abertura | `arquivos/imagens/stories-sistema-emissor-contador.jpg` (foto + título) |
+| 1 · abertura | `arquivos/imagens/stories-sistema-emissor-contador.jpg` (título + faixa de foto) |
 | 2 a 6 | `arquivos/imagens/stories-sistema-emissor-contador-<n>.jpg` (texto sobre o espresso) |
 
-Os quadros de texto saem **deste arquivo**: `python3 scripts/gerar-stories.py --marca rotacte
-arquivos/stories-sistema-emissor-contador.md` lê as citações abaixo e regrava os JPEG. Mexeu
-no texto daqui, roda de novo — não editar a imagem à mão.
+Os seis saem **deste arquivo**, num comando só:
+
+```bash
+python3 scripts/gerar-stories.py --marca rotacte \
+  --abertura arquivos/fotos/escritorio-logistica.jpg \
+  --olho "Sistema emissor para contador" \
+  --titulo "Dez clientes|não precisam|de dez logins." --foco "center 45%" \
+  arquivos/stories-sistema-emissor-contador.md
+```
+
+Mexeu no texto daqui, roda de novo — não editar a imagem à mão. ⚠️ A abertura do RotaCTe
+**não** sai do `gerar-capa.py --formato stories`: aquele põe foto sangrando com véu e texto
+em cima, que é o tratamento do Reservya e o que a identidade ROTA proíbe.
+
+A **linha de rota anda com o story**: 0 na abertura, 20% no primeiro texto e fechada no
+sexto, que é o do link.
 
 ---
 
