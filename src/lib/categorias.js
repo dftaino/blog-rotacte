@@ -12,6 +12,7 @@ export const CATEGORIAS = [
   { slug: 'reforma-tributaria', nome: 'Reforma tributária' },
   { slug: 'frota', nome: 'Gestão de frota' },
   { slug: 'financeiro', nome: 'Financeiro' },
+  { slug: 'contabilidade', nome: 'Contabilidade' },
 ]
 
 export const categoriaPorSlug = (slug) => CATEGORIAS.find((c) => c.slug === slug) || null
